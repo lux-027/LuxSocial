@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-gradient {
+    @apply bg-gradient-to-r from-lux-purple to-lux-purple-light text-white font-semibold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-2xl focus:border-lux-purple focus:outline-none transition-colors duration-300;
+  }
+  
+  .header-gradient {
+    background: linear-gradient(270deg, #6716DF, #8B3ADF, #BE16DF, #9B3ADF);
+    background-size: 200% 200%;
+    animation: gradientDance 15s ease-in-out infinite;
+    filter: brightness(1.1) saturate(1.2);
+  }
+
+  .animated-gradient-bg {
+    background: linear-gradient(270deg, #6716DF, #8B3ADF, #BE16DF, #9B3ADF);
+    background-size: 200% 200%;
+    animation: gradientDance 15s ease-in-out infinite;
+    filter: brightness(1.1) saturate(1.2);
+  }
+
+  .animated-gradient-text {
+    background: linear-gradient(270deg, #6716DF, #8B3ADF, #BE16DF, #9B3ADF);
+    background-size: 200% 200%;
+    animation: gradientDance 15s ease-in-out infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: brightness(1.1) saturate(1.2);
+  }
+
+  .segment-control {
+    background: rgba(200, 200, 200, 0.35);
+    backdrop-filter: blur(12px) saturate(150%) brightness(0.9);
+    -webkit-backdrop-filter: blur(12px) saturate(150%) brightness(0.9);
+    @apply rounded-full p-2 flex relative overflow-hidden;
+    min-height: 2.5rem;
+    border: 1px solid rgba(180, 180, 180, 0.6);
+    box-shadow: 0 12px 40px rgba(150, 150, 150, 0.3), inset 0 2px 4px rgba(200, 200, 200, 0.6), inset 0 1px 0 rgba(220, 220, 220, 0.8);
+  }
+
+  .segment-option {
+    @apply px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 relative z-10;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .segment-option.active {
+    color: white;
+    font-weight: 600;
+  }
+
+  .segment-slider {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    @apply absolute rounded-full transition-all duration-300 ease-out;
+    top: 0.125rem;
+    bottom: 0.125rem;
+    left: 0;
+    right: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(103, 22, 223, 0.1);
+  }
+
+  /* Neon Efektleri - Soft ve Premium */
+  .neon-border {
+    border-color: #6716DF;
+    box-shadow: 0 0 8px rgba(103, 22, 223, 0.3), 0 0 16px rgba(103, 22, 223, 0.2), inset 0 0 8px rgba(103, 22, 223, 0.1);
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 15px rgba(103, 22, 223, 0.4), 0 0 30px rgba(103, 22, 223, 0.3);
+    filter: brightness(1.1);
+  }
+
+  .neon-pulse {
+    animation: neonPulse 4s ease-in-out infinite;
+  }
+
+  .neon-rotate {
+    animation: neonRotate 3s linear infinite;
+  }
+
+  /* Canlı İndirme Sayacı */
+  .download-counter {
+    background: linear-gradient(135deg, #6716DF 0%, #BE16DF 100%);
+    @apply text-white px-6 py-3 rounded-2xl shadow-lg;
+    animation: counterGlow 5s ease-in-out infinite;
+    filter: brightness(1.15) saturate(1.2);
+  }
+
+  /* Footer */
+  .lux-footer {
+    @apply bg-white text-gray-700 py-8 border-2 border-lux-purple;
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1);
+  }
+}
+
+@keyframes gradientDance {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(103, 22, 223, 0.3), 0 0 16px rgba(103, 22, 223, 0.2), inset 0 0 8px rgba(103, 22, 223, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(103, 22, 223, 0.4), 0 0 24px rgba(103, 22, 223, 0.3), inset 0 0 12px rgba(103, 22, 223, 0.15);
+  }
+}
+
+@keyframes neonRotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes counterGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(103, 22, 223, 0.4), 0 0 30px rgba(103, 22, 223, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(103, 22, 223, 0.5), 0 0 50px rgba(103, 22, 223, 0.4);
+  }
+}

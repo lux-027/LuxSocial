@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { Download, Play, Instagram, Youtube, Facebook, Twitter, DownloadCloud, Eye, Loader2, ArrowLeft, Shield, Info, FileText, Home as HomeIcon } from 'lucide-react'
+import { Download, Play, Instagram, Youtube, Facebook, Twitter, DownloadCloud, Eye, Loader2, ArrowLeft, Shield, Info, FileText, Home as HomeIcon, ChevronDown } from 'lucide-react'
 
 export default function Home() {
   const [videoUrl, setVideoUrl] = useState('')
@@ -14,7 +14,26 @@ export default function Home() {
   const [urlError, setUrlError] = useState('') // Hata mesajı için state
   const [videoPreview, setVideoPreview] = useState<any>(null) // Video ön izleme için state
   const [downloadError, setDownloadError] = useState('') // İndirme hatası için state
+  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false) // Mobil dropdown açık/kapalı
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null) // Debounce timer
+  const mobileDropdownRef = useRef<HTMLDivElement>(null) // Mobil dropdown referansı
+
+  // Dropdown'u dışarı tıklandığında kapat
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target as Node)) {
+        setIsMobileDropdownOpen(false)
+      }
+    }
+
+    if (isMobileDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isMobileDropdownOpen])
 
   // Canlı indirme sayacı
   useEffect(() => {
@@ -54,52 +73,78 @@ export default function Home() {
       }
 
       if (data.success && data.downloadUrl) {
-        // 🌊 Tarayıcı İnadını Kır - Blob ile Zorunlu İndirme!
+        // 🌊 Mobil Uyumlu Proxy İndirme!
         try {
-          console.log('🚀 BLOB_INDIRME_BASLADI:', data.downloadUrl)
+          console.log('📱 MOBIL_PROXY_INDIRME_BASLADI:', data.downloadUrl)
           
-          // Videoyu arka planda çek
-          const videoResponse = await fetch(data.downloadUrl)
+          // Backend proxy URL'i oluştur
+          const proxyUrl = `/api/download-file?url=${encodeURIComponent(data.downloadUrl)}`
+          console.log('🔗 PROXY_URL:', proxyUrl)
           
-          if (!videoResponse.ok) {
-            throw new Error('Video indirilemedi')
+          // Mobil cihaz için doğrudan yönlendirme
+          const link = document.createElement('a')
+          link.href = proxyUrl
+          link.style.display = 'none'
+          
+          // DOM'a ekle ve tıkla
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          
+          console.log('🎉 MOBIL_INDIRME_BASARILI!')
+          
+        } catch (mobileError: any) {
+          console.error('🚨 MOBIL_INDIRME_HATASI:', mobileError)
+          
+          // Mobil başarısız olursa masaüstü yöntemine geri dön
+          console.log('⚠️ DESKTOP_YONTEM_DENENIYOR...')
+          
+          try {
+            console.log('🚀 BLOB_INDIRME_BASLADI:', data.downloadUrl)
+            
+            // Videoyu arka planda çek
+            const videoResponse = await fetch(data.downloadUrl)
+            
+            if (!videoResponse.ok) {
+              throw new Error('Video indirilemedi')
+            }
+            
+            // Blob oluştur (veri paketi)
+            const blob = await videoResponse.blob()
+            console.log('✅ BLOB_OLUSTURULDU:', blob.size, 'bytes')
+            
+            // Geçici obje URL'si oluştur
+            const blobUrl = window.URL.createObjectURL(blob)
+            
+            // Görünmez a etiketi oluştur
+            const blobLink = document.createElement('a')
+            blobLink.href = blobUrl
+            blobLink.download = data.title || 'luxsocial-tiktok-video.mp4'
+            blobLink.style.display = 'none'
+            
+            // DOM'a ekle, tıkla ve temizle
+            document.body.appendChild(blobLink)
+            blobLink.click()
+            document.body.removeChild(blobLink)
+            
+            // Belleği temizle
+            window.URL.revokeObjectURL(blobUrl)
+            
+            console.log('🎉 DESKTOP_INDIRME_BASARILI!')
+            
+          } catch (blobError: any) {
+            console.error('🚨 BLOB_INDIRME_HATASI:', blobError)
+            
+            // En son çare: eski yöntem
+            console.log('⚠️ ESKI_YONTEM_DENENIYOR...')
+            const oldLink = document.createElement('a')
+            oldLink.href = data.downloadUrl
+            oldLink.download = data.title || 'luxsocial-tiktok-video.mp4'
+            oldLink.style.display = 'none'
+            document.body.appendChild(oldLink)
+            oldLink.click()
+            document.body.removeChild(oldLink)
           }
-          
-          // Blob oluştur (veri paketi)
-          const blob = await videoResponse.blob()
-          console.log('✅ BLOB_OLUSTURULDU:', blob.size, 'bytes')
-          
-          // Geçici obje URL'si oluştur
-          const blobUrl = window.URL.createObjectURL(blob)
-          
-          // Görünmez a etiketi oluştur
-          const link = document.createElement('a')
-          link.href = blobUrl
-          link.download = data.title || 'luxsocial-tiktok-video.mp4'
-          link.style.display = 'none'
-          
-          // DOM'a ekle, tıkla ve temizle
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          
-          // Belleği temizle
-          window.URL.revokeObjectURL(blobUrl)
-          
-          console.log('🎉 INDIRME_BASARILI!')
-          
-        } catch (blobError: any) {
-          console.error('🚨 BLOB_INDIRME_HATASI:', blobError)
-          
-          // Blob başarısız olursa eski yönteme geri dön
-          console.log('⚠️ ESKI_YONTEM_DENENIYOR...')
-          const link = document.createElement('a')
-          link.href = data.downloadUrl
-          link.download = data.title || 'luxsocial-tiktok-video.mp4'
-          link.style.display = 'none'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
         }
 
         // İndirme sayacını artır
@@ -258,11 +303,18 @@ export default function Home() {
       <div className="fixed inset-0 animated-gradient-bg opacity-10 -z-10"></div>
       {/* Header */}
       <header className="header-gradient shadow-lg relative overflow-hidden">
-        {/* Çapraz Kesim */}
-        <div className="absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '45%', left: '-15%'}}></div>
+        {/* Masaüstü: Çapraz Kesim */}
+        <div className="hidden md:block absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '45%', left: '-15%'}}></div>
         
-        <div className="container mx-auto px-4 py-6 relative z-10">
-          <div className="flex items-center justify-between">
+        {/* Mobil: Bölünmüş Header */}
+        <div className="md:hidden absolute inset-0 flex">
+          <div className="w-1/2 bg-white"></div>
+          <div className="w-1/2 animated-gradient-bg"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Masaüstü Header */}
+          <div className="hidden md:flex items-center justify-between py-6">
             <div className="flex items-center space-x-3">
               {/* Download İkonlu Logo */}
               <div className="w-12 h-12 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20">
@@ -274,7 +326,7 @@ export default function Home() {
               </h1>
             </div>
             
-            {/* iPhone Tarzı Segment Kontrol */}
+            {/* iPhone Tarzı Segment Kontrol - Masaüstü */}
             <div className="hidden md:block">
               <div className="segment-control">
                 <div 
@@ -302,6 +354,88 @@ export default function Home() {
               </div>
             </div>
           </div>
+          
+          {/* Mobil Header */}
+          <div className="md:hidden">
+            {/* Bölünmüş Logo Bar */}
+            <div className="flex items-center justify-between py-4">
+              {/* Sol Beyaz Kısım - Lux */}
+              <div className="flex-1 flex items-center justify-center">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 animated-gradient-bg rounded-lg flex items-center justify-center shadow-lg border border-white/20">
+                    <DownloadCloud className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-2xl font-black tracking-tight text-lux-purple">Lux</span>
+                </div>
+              </div>
+              
+              {/* Sağ Mor Kısım - Social */}
+              <div className="flex-1 flex items-center justify-center">
+                <span className="text-2xl font-black tracking-tight text-white">Social</span>
+              </div>
+            </div>
+            
+            {/* Mobil Platform Seçici */}
+            <div className="pb-4">
+              <div className="relative" ref={mobileDropdownRef}>
+                {/* Dropdown Butonu */}
+                <button
+                  onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
+                  className="w-full bg-white/20 backdrop-blur-md rounded-2xl p-3 flex items-center justify-between border border-white/30 shadow-lg hover:bg-white/30 transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-3">
+                    {(() => {
+                      const currentPlatform = platforms.find(p => p.name === selectedPlatform)
+                      const Icon = currentPlatform?.icon || DownloadCloud
+                      return <Icon className="w-5 h-5 text-white" />
+                    })()}
+                    <span className="text-white font-semibold">{selectedPlatform}</span>
+                  </div>
+                  <ChevronDown 
+                    className={`w-4 h-4 text-white transition-transform duration-300 ${
+                      isMobileDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Menü */}
+                <AnimatePresence>
+                  {isMobileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl overflow-hidden z-50"
+                    >
+                      <div className="animated-gradient-bg">
+                        {platforms.map((platform, index) => {
+                          const Icon = platform.icon
+                          return (
+                            <button
+                              key={platform.name}
+                              onClick={() => {
+                                handlePlatformChange(platform.name)
+                                setIsMobileDropdownOpen(false)
+                              }}
+                              className={`w-full p-3 flex items-center space-x-3 transition-all duration-300 ${
+                                selectedPlatform === platform.name
+                                  ? 'bg-white/30 border-l-4 border-white'
+                                  : 'hover:bg-white/20'
+                              }`}
+                            >
+                              <Icon className="w-4 h-4 text-white" />
+                              <span className="text-white font-medium">{platform.name}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -310,10 +444,26 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <h2 className="text-5xl font-bold text-gray-900 mb-4">
+            {/* Masaüstü: Tek Satır Başlık */}
+            <h2 className="hidden md:block text-5xl font-bold text-gray-900 mb-4">
               {selectedPlatform} Filigransız Video İndirme
             </h2>
-            <p className="text-xl text-gray-600">
+            
+            {/* Mobil: Bölünmüş Başlık */}
+            <div className="md:hidden">
+              {/* Ana Platform Başlığı */}
+              <h2 className="text-4xl font-bold text-gray-900 mb-1">
+                {selectedPlatform}
+              </h2>
+              
+              {/* Alt Açıklama */}
+              <p className="text-sm font-medium text-gray-600 opacity-80">
+                Filigransız Video İndirme
+              </p>
+            </div>
+            
+            {/* Açıklama Metni */}
+            <p className="text-xl text-gray-600 mt-4">
               {selectedPlatform} ve diğer platformlardan videoları filigransız indirin
             </p>
           </div>

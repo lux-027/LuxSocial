@@ -307,7 +307,7 @@ export default function Home() {
         <div className="hidden md:block absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '45%', left: '-15%'}}></div>
         
         {/* Mobil: Çapraz Kesim */}
-        <div className="md:hidden absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '55%', left: '-10%'}}></div>
+        <div className="md:hidden absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '45%', left: '-10%'}}></div>
         
         <div className="container mx-auto px-4 relative z-10">
           {/* Masaüstü Header */}
@@ -372,7 +372,7 @@ export default function Home() {
                 {/* Dropdown Butonu */}
                 <button
                   onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                  className="w-full bg-white/40 backdrop-blur-md rounded-2xl p-3 flex items-center justify-between border border-white/50 shadow-lg hover:bg-white/50 transition-all duration-300"
+                  className="w-full bg-white/40 backdrop-blur-md rounded-2xl p-3 flex items-center justify-between shadow-lg hover:bg-white/50 transition-all duration-300"
                 >
                   <div className="flex items-center space-x-3">
                     {(() => {
@@ -397,7 +397,7 @@ export default function Home() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: 'easeOut' }}
-                      className="absolute top-full left-0 right-0 mt-2 bg-white/40 backdrop-blur-md rounded-2xl border border-white/50 shadow-xl overflow-hidden z-50"
+                      className="absolute top-full left-0 right-0 mt-2 bg-white/40 backdrop-blur-md rounded-2xl shadow-xl overflow-visible z-50"
                     >
                       <div className="animated-gradient-bg">
                         {platforms.map((platform, index) => {

@@ -357,22 +357,16 @@ export default function Home() {
           
           {/* Mobil Header */}
           <div className="md:hidden">
-            {/* Bölünmüş Logo Bar */}
-            <div className="flex items-center justify-between py-4">
-              {/* Sol Beyaz Kısım - Lux */}
-              <div className="flex-1 flex items-center justify-center">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 animated-gradient-bg rounded-lg flex items-center justify-center shadow-lg border border-white/20">
-                    <DownloadCloud className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-2xl font-black tracking-tight text-lux-purple">Lux</span>
-                </div>
+            {/* Mobil Logo Bar */}
+            <div className="flex items-center justify-center py-4">
+              {/* Download İkonlu Logo */}
+              <div className="w-8 h-8 animated-gradient-bg rounded-lg flex items-center justify-center shadow-lg border border-white/20 mr-2">
+                <DownloadCloud className="w-5 h-5 text-white" />
               </div>
-              
-              {/* Sağ Mor Kısım - Social */}
-              <div className="flex-1 flex items-center justify-center">
-                <span className="text-2xl font-black tracking-tight text-white">Social</span>
-              </div>
+              <h1 className="text-2xl font-black tracking-tight">
+                <span className="text-lux-purple">Lux</span>
+                <span className="text-white">Social</span>
+              </h1>
             </div>
             
             {/* Mobil Platform Seçici */}

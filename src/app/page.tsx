@@ -306,11 +306,8 @@ export default function Home() {
         {/* Masaüstü: Çapraz Kesim */}
         <div className="hidden md:block absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '45%', left: '-15%'}}></div>
         
-        {/* Mobil: Bölünmüş Header */}
-        <div className="md:hidden absolute inset-0 flex">
-          <div className="w-1/2 bg-white"></div>
-          <div className="w-1/2 animated-gradient-bg"></div>
-        </div>
+        {/* Mobil: Çapraz Kesim */}
+        <div className="md:hidden absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '40%', left: '-10%'}}></div>
         
         <div className="container mx-auto px-4 relative z-10">
           {/* Masaüstü Header */}
@@ -358,19 +355,19 @@ export default function Home() {
           {/* Mobil Header */}
           <div className="md:hidden">
             {/* Mobil Logo Bar */}
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-start py-6">
               {/* Download İkonlu Logo */}
-              <div className="w-8 h-8 animated-gradient-bg rounded-lg flex items-center justify-center shadow-lg border border-white/20 mr-2">
-                <DownloadCloud className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
+                <DownloadCloud className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-black tracking-tight">
+              <h1 className="text-3xl font-black tracking-tight">
                 <span className="text-lux-purple">Lux</span>
                 <span className="text-white">Social</span>
               </h1>
             </div>
             
             {/* Mobil Platform Seçici */}
-            <div className="pb-4">
+            <div className="pb-6">
               <div className="relative" ref={mobileDropdownRef}>
                 {/* Dropdown Butonu */}
                 <button

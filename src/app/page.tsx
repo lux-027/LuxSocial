@@ -355,35 +355,33 @@ export default function Home() {
           {/* Mobil Header */}
           <div className="md:hidden">
             {/* Mobil Logo Bar */}
-            <div className="flex items-start py-6">
+            <div className="flex items-start justify-between py-6">
               {/* Download İkonlu Logo */}
-              <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
-                <DownloadCloud className="w-6 h-6 text-white" />
+              <div className="flex items-center">
+                <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
+                  <DownloadCloud className="w-6 h-6 text-white" />
+                </div>
+                <h1 className="text-3xl font-black tracking-tight">
+                  <span className="text-lux-purple">Lux</span>
+                  <span className="mx-2 text-white">Social</span>
+                </h1>
               </div>
-              <h1 className="text-3xl font-black tracking-tight">
-                <span className="text-lux-purple">Lux</span>
-                <span className="mx-2 text-white">Social</span>
-              </h1>
-            </div>
-            
-            {/* Mobil Platform Seçici */}
-            <div className="pb-6">
+              
+              {/* Mobil Platform Seçici */}
               <div className="relative" ref={mobileDropdownRef}>
                 {/* Dropdown Butonu */}
                 <button
                   onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                  className="w-full bg-white/40 backdrop-blur-md rounded-2xl p-3 flex items-center justify-between shadow-lg hover:bg-white/50 transition-all duration-300"
+                  className="bg-white/40 backdrop-blur-md rounded-xl px-3 py-2 flex items-center space-x-2 shadow-lg hover:bg-white/50 transition-all duration-300"
                 >
-                  <div className="flex items-center space-x-3">
-                    {(() => {
-                      const currentPlatform = platforms.find(p => p.name === selectedPlatform)
-                      const Icon = currentPlatform?.icon || DownloadCloud
-                      return <Icon className="w-5 h-5 text-white" />
-                    })()}
-                    <span className="text-white font-semibold">{selectedPlatform}</span>
-                  </div>
+                  {(() => {
+                    const currentPlatform = platforms.find(p => p.name === selectedPlatform)
+                    const Icon = currentPlatform?.icon || DownloadCloud
+                    return <Icon className="w-4 h-4 text-white" />
+                  })()}
+                  <span className="text-white font-medium text-sm">{selectedPlatform}</span>
                   <ChevronDown 
-                    className={`w-4 h-4 text-white transition-transform duration-300 ${
+                    className={`w-3 h-3 text-white transition-transform duration-300 ${
                       isMobileDropdownOpen ? 'rotate-180' : ''
                     }`}
                   />
@@ -397,7 +395,7 @@ export default function Home() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: 'easeOut' }}
-                      className="absolute top-full left-0 right-0 mt-2 bg-white/40 backdrop-blur-md rounded-2xl shadow-xl overflow-visible z-50"
+                      className="absolute top-full right-0 mt-2 bg-white/40 backdrop-blur-md rounded-xl shadow-xl overflow-visible z-50 min-w-[150px]"
                     >
                       <div className="animated-gradient-bg">
                         {platforms.map((platform, index) => {
@@ -409,14 +407,14 @@ export default function Home() {
                                 handlePlatformChange(platform.name)
                                 setIsMobileDropdownOpen(false)
                               }}
-                              className={`w-full p-3 flex items-center space-x-3 transition-all duration-300 ${
+                              className={`w-full px-3 py-2 flex items-center space-x-2 transition-all duration-300 ${
                                 selectedPlatform === platform.name
-                                  ? 'bg-white/30 border-l-4 border-white'
+                                  ? 'bg-white/30 border-l-2 border-white'
                                   : 'hover:bg-white/20'
                               }`}
                             >
                               <Icon className="w-4 h-4 text-white" />
-                              <span className="text-white font-medium">{platform.name}</span>
+                              <span className="text-white font-medium text-sm">{platform.name}</span>
                             </button>
                           )
                         })}

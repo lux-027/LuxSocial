@@ -8,6 +8,9 @@ export const metadata = {
   title: 'LuxSocial | TikTok, Instagram, YouTube Filigransız Video İndir',
   description: 'TikTok, Instagram, YouTube ve Twitter videolarını saniyeler içinde, ücretsiz ve filigransız (no watermark) olarak indir. LuxSocial ile en yüksek kalitede medya indirme deneyimi.',
   keywords: 'video indir, tiktok filigransız indir, instagram video downloader, youtube mp4 indir, filigransız video, luxsocial',
+  verification: {
+    google: 'x7p7UrXXgoM-nDzCeRywW_MTd21rLFo1DxwTJogTKRg'
+  },
   robots: {
     index: true,
     follow: true,

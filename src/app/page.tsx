@@ -193,27 +193,32 @@ export default function Home() {
     }
   }
 
-  // Anında ön izleme için debounce fonksiyonu
+  // Anında ön izleme için debounce  // Video ön izleme çekme
   const fetchVideoPreview = async (url: string, platform: string) => {
-    if (!url || !platform || urlError) return
-    
     setIsPreviewLoading(true)
     setDownloadError('')
     
     try {
+      // URL'i encode et (özellikle özel karakterler için)
+      const encodedUrl = encodeURIComponent(url)
+      
+      console.log('🚀 FRONTEND_ISTEK_GONDERILIYOR:', { url, encodedUrl, platform })
+      
       const response = await fetch('/api/download', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          url,
+          url: encodedUrl,
           platform,
           preview: true // Ön izleme modu
         })
       })
       
       const data = await response.json()
+      
+      console.log('📥 FRONTEND_YANIT_ALINDI:', { status: response.status, data })
       
       if (!response.ok) {
         throw new Error(data.error || 'Ön izleme alınamadı')
@@ -222,8 +227,17 @@ export default function Home() {
       setVideoPreview(data)
       
     } catch (error: any) {
-      console.error('Ön izleme hatası:', error)
-      // Ön izleme hatasında sessizce geç, sadece indirme butonuna basınca göster
+      console.error('🚨 FRONTEND_ON_IZLEME_HATASI:', error)
+      
+      // Şık hata mesajı göster
+      if (error.message.includes('400')) {
+        setDownloadError('Geçersiz link formatı. Lütfen linki kontrol edip tekrar deneyin.')
+      } else if (error.message.includes('500')) {
+        setDownloadError('Bu platform şu an yanıt vermiyor. Lütfen daha sonra tekrar deneyin.')
+      } else {
+        setDownloadError(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.')
+      }
+      
     } finally {
       setIsPreviewLoading(false)
     }

@@ -308,7 +308,7 @@ export default function Home() {
           {/* Mobil Header */}
           <div className="md:hidden">
             {/* Mobil Logo Bar */}
-            <div className="flex items-center justify-center py-6">
+            <div className="flex items-start py-6">
               {/* Download İkonlu Logo */}
               <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
                 <DownloadCloud className="w-6 h-6 text-white" />
@@ -317,6 +317,32 @@ export default function Home() {
                 <span className="text-lux-purple">Lux</span>
                 <span className="mx-2 text-white">Social</span>
               </h1>
+            </div>
+            
+            {/* Mobil Platform Seçici - Toolbar Altında */}
+            <div className="pb-4">
+              <p className="text-sm font-semibold text-white/80 mb-3 ml-3">Platform Seçin:</p>
+              <div className="segment-control">
+                <div 
+                  className="segment-slider"
+                  style={{ 
+                    width: `${100 / platforms.length}%`,
+                    transform: `translateX(${platforms.findIndex(p => p.name === selectedPlatform) * 100}%)`
+                  }}
+                ></div>
+                {platforms.map((platform) => {
+                  const Icon = platform.icon
+                  return (
+                    <button
+                      key={platform.name}
+                      onClick={() => handlePlatformChange(platform.name)}
+                      className={`segment-option ${selectedPlatform === platform.name ? 'active' : 'text-white/70'}`}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -343,32 +369,6 @@ export default function Home() {
               <p className="text-sm font-medium text-gray-600 opacity-80">
                 Filigransız Video İndirme
               </p>
-            </div>
-            
-            {/* Platform Buttons (Mobile) */}
-            <div className="md:hidden mt-6">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Platform Seçin:</p>
-              <div className="segment-control">
-                <div 
-                  className="segment-slider"
-                  style={{ 
-                    width: `${100 / platforms.length}%`,
-                    transform: `translateX(${platforms.findIndex(p => p.name === selectedPlatform) * 100}%)`
-                  }}
-                ></div>
-                {platforms.map((platform) => {
-                  const Icon = platform.icon
-                  return (
-                    <button
-                      key={platform.name}
-                      onClick={() => handlePlatformChange(platform.name)}
-                      className={`segment-option ${selectedPlatform === platform.name ? 'active' : 'text-white/70'}`}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </button>
-                  )
-                })}
-              </div>
             </div>
             
             {/* Açıklama Metni */}

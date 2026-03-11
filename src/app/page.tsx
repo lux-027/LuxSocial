@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { Download, Play, Instagram, Youtube, Facebook, Twitter, DownloadCloud, Eye, Loader2, ArrowLeft, Shield, Info, FileText, Home as HomeIcon, ChevronDown } from 'lucide-react'
+import { Download, Play, Instagram, Youtube, Facebook, Twitter, DownloadCloud, Eye, Loader2, ArrowLeft, Shield, Info, FileText, Home as HomeIcon } from 'lucide-react'
 
 export default function Home() {
   const [videoUrl, setVideoUrl] = useState('')
@@ -14,26 +14,7 @@ export default function Home() {
   const [urlError, setUrlError] = useState('') // Hata mesajı için state
   const [videoPreview, setVideoPreview] = useState<any>(null) // Video ön izleme için state
   const [downloadError, setDownloadError] = useState('') // İndirme hatası için state
-  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false) // Mobil dropdown açık/kapalı
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null) // Debounce timer
-  const mobileDropdownRef = useRef<HTMLDivElement>(null) // Mobil dropdown referansı
-
-  // Dropdown'u dışarı tıklandığında kapat
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target as Node)) {
-        setIsMobileDropdownOpen(false)
-      }
-    }
-
-    if (isMobileDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isMobileDropdownOpen])
 
   // Canlı indirme sayacı
   useEffect(() => {
@@ -322,174 +303,24 @@ export default function Home() {
                 <span className="animated-gradient-text">Social</span>
               </h1>
             </div>
-            
-            {/* iPhone Tarzı Segment Kontrol - Masaüstü */}
-            <div className="hidden md:block">
-              <div className="segment-control">
-                <div 
-                  className="segment-slider"
-                  style={{ 
-                    width: `${100 / platforms.length}%`,
-                    transform: `translateX(${platforms.findIndex(p => p.name === selectedPlatform) * 100}%)`
-                  }}
-                ></div>
-                {platforms.map((platform) => {
-                  const Icon = platform.icon
-                  return (
-                    <button
-                      key={platform.name}
-                      onClick={() => handlePlatformChange(platform.name)}
-                      className={`segment-option ${selectedPlatform === platform.name ? 'active' : 'text-gray-600 hover:text-gray-900'}`}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <Icon className="w-4 h-4" />
-                        <span>{platform.name}</span>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
           </div>
           
           {/* Mobil Header */}
           <div className="md:hidden">
             {/* Mobil Logo Bar */}
-            <div className="flex items-start justify-between py-6">
+            <div className="flex items-center justify-center py-6">
               {/* Download İkonlu Logo */}
-              <div className="flex items-center">
-                <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
-                  <DownloadCloud className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-3xl font-black tracking-tight">
-                  <span className="text-lux-purple">Lux</span>
-                  <span className="mx-2 text-white">Social</span>
-                </h1>
+              <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
+                <DownloadCloud className="w-6 h-6 text-white" />
               </div>
-              
-              {/* Mobil Platform Seçici */}
-              <div className="relative" ref={mobileDropdownRef}>
-                {/* Dropdown Butonu */}
-                <button
-                  onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                  className="bg-white/40 backdrop-blur-md rounded-xl px-3 py-2 flex items-center space-x-2 shadow-lg hover:bg-white/50 transition-all duration-300"
-                >
-                  {(() => {
-                    const currentPlatform = platforms.find(p => p.name === selectedPlatform)
-                    const Icon = currentPlatform?.icon || DownloadCloud
-                    return <Icon className="w-4 h-4 text-white" />
-                  })()}
-                  <span className="text-white font-medium text-sm">{selectedPlatform}</span>
-                  <ChevronDown 
-                    className={`w-3 h-3 text-white transition-transform duration-300 ${
-                      isMobileDropdownOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-
-                {/* Dropdown Menü */}
-                <AnimatePresence>
-                  {isMobileDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
-                      className="absolute top-full right-0 mt-2 bg-white/40 backdrop-blur-md rounded-xl shadow-xl overflow-visible z-50 min-w-[150px]"
-                    >
-                      <div className="animated-gradient-bg">
-                        {platforms.map((platform, index) => {
-                          const Icon = platform.icon
-                          return (
-                            <button
-                              key={platform.name}
-                              onClick={() => {
-                                handlePlatformChange(platform.name)
-                                setIsMobileDropdownOpen(false)
-                              }}
-                              className={`w-full px-3 py-2 flex items-center space-x-2 transition-all duration-300 ${
-                                selectedPlatform === platform.name
-                                  ? 'bg-white/30 border-l-2 border-white'
-                                  : 'hover:bg-white/20'
-                              }`}
-                            >
-                              <Icon className="w-4 h-4 text-white" />
-                              <span className="text-white font-medium text-sm">{platform.name}</span>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <h1 className="text-3xl font-black tracking-tight">
+                <span className="text-lux-purple">Lux</span>
+                <span className="mx-2 text-white">Social</span>
+              </h1>
             </div>
           </div>
         </div>
       </header>
-      
-      {/* Mobil Platform Seçici - Toolbar Altında */}
-      <div className="md:hidden bg-white/10 backdrop-blur-md border-b border-white/20">
-        <div className="container mx-auto px-4 py-4">
-          <div className="relative" ref={mobileDropdownRef}>
-            {/* Dropdown Butonu */}
-            <button
-              onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-              className="w-full bg-white/30 backdrop-blur-md rounded-xl p-3 flex items-center justify-between shadow-lg hover:bg-white/40 transition-all duration-300"
-            >
-              <div className="flex items-center space-x-3">
-                {(() => {
-                  const currentPlatform = platforms.find(p => p.name === selectedPlatform)
-                  const Icon = currentPlatform?.icon || DownloadCloud
-                  return <Icon className="w-5 h-5 text-white" />
-                })()}
-                <span className="text-white font-semibold">{selectedPlatform}</span>
-              </div>
-              <ChevronDown 
-                className={`w-4 h-4 text-white transition-transform duration-300 ${
-                  isMobileDropdownOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-
-            {/* Dropdown Menü */}
-            <AnimatePresence>
-              {isMobileDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-white/30 backdrop-blur-md rounded-xl shadow-xl overflow-visible z-50"
-                >
-                  <div className="animated-gradient-bg">
-                    {platforms.map((platform, index) => {
-                      const Icon = platform.icon
-                      return (
-                        <button
-                          key={platform.name}
-                          onClick={() => {
-                            handlePlatformChange(platform.name)
-                            setIsMobileDropdownOpen(false)
-                          }}
-                          className={`w-full p-3 flex items-center space-x-3 transition-all duration-300 ${
-                            selectedPlatform === platform.name
-                              ? 'bg-white/30 border-l-4 border-white'
-                              : 'hover:bg-white/20'
-                          }`}
-                        >
-                          <Icon className="w-5 h-5 text-white" />
-                          <span className="text-white font-medium">{platform.name}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">

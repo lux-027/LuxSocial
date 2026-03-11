@@ -345,6 +345,32 @@ export default function Home() {
               </p>
             </div>
             
+            {/* Platform Buttons (Mobile) */}
+            <div className="md:hidden mt-6">
+              <p className="text-sm font-semibold text-gray-700 mb-3">Platform Seçin:</p>
+              <div className="segment-control">
+                <div 
+                  className="segment-slider"
+                  style={{ 
+                    width: `${100 / platforms.length}%`,
+                    transform: `translateX(${platforms.findIndex(p => p.name === selectedPlatform) * 100}%)`
+                  }}
+                ></div>
+                {platforms.map((platform) => {
+                  const Icon = platform.icon
+                  return (
+                    <button
+                      key={platform.name}
+                      onClick={() => handlePlatformChange(platform.name)}
+                      className={`segment-option ${selectedPlatform === platform.name ? 'active' : 'text-white/70'}`}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            
             {/* Açıklama Metni */}
             <p className="text-xl text-gray-600 mt-4">
               {selectedPlatform} ve diğer platformlardan videoları filigransız indirin
@@ -385,32 +411,6 @@ export default function Home() {
                   {urlError}
                 </p>
               )}
-            </div>
-
-            {/* Platform Buttons (Mobile) */}
-            <div className="md:hidden mb-6">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Platform Seçin:</p>
-              <div className="segment-control">
-                <div 
-                  className="segment-slider"
-                  style={{ 
-                    width: `${100 / platforms.length}%`,
-                    transform: `translateX(${platforms.findIndex(p => p.name === selectedPlatform) * 100}%)`
-                  }}
-                ></div>
-                {platforms.map((platform) => {
-                  const Icon = platform.icon
-                  return (
-                    <button
-                      key={platform.name}
-                      onClick={() => handlePlatformChange(platform.name)}
-                      className={`segment-option ${selectedPlatform === platform.name ? 'active' : 'text-white/70'}`}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </button>
-                  )
-                })}
-              </div>
             </div>
 
             {/* Download Button */}

@@ -17,15 +17,26 @@ export default function GizlilikPolitikasi() {
               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg neon-glow">
                 <Shield className="w-7 h-7 text-lux-purple" />
               </div>
-              <h1 className="text-3xl font-bold text-white">Gizlilik Politikası</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">Gizlilik Politikası</h1>
             </div>
-            <Link 
-              href="/" 
-              className="hidden md:flex items-center space-x-2 text-white hover:text-lux-plum transition-colors duration-300"
-            >
-              <Home className="w-5 h-5" />
-              <span>Ana Sayfa</span>
-            </Link>
+            <div className="flex items-center space-x-4">
+              {/* Mobil Geri Dönüş Butonu */}
+              <Link 
+                href="/" 
+                className="md:hidden flex items-center space-x-2 text-white hover:text-lux-plum transition-colors duration-300"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span className="text-sm">Geri</span>
+              </Link>
+              {/* Masaüstü Ana Sayfa Butonu */}
+              <Link 
+                href="/" 
+                className="hidden md:flex items-center space-x-2 text-white hover:text-lux-plum transition-colors duration-300"
+              >
+                <Home className="w-5 h-5" />
+                <span>Ana Sayfa</span>
+              </Link>
+            </div>
           </div>
         </div>
       </header>

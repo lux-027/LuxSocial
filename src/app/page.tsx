@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { Download, Play, Instagram, Youtube, Facebook, Twitter, DownloadCloud, Eye, Loader2, ArrowLeft, Shield, Info, FileText, Home as HomeIcon } from 'lucide-react'
+import { Download, Play, Instagram, Youtube, Facebook, Twitter, DownloadCloud, Eye, Loader2, ArrowLeft, Shield, Info, FileText, Home as HomeIcon, Menu, X } from 'lucide-react'
 
 export default function Home() {
   const [videoUrl, setVideoUrl] = useState('')
@@ -14,6 +14,7 @@ export default function Home() {
   const [urlError, setUrlError] = useState('') // Hata mesajı için state
   const [videoPreview, setVideoPreview] = useState<any>(null) // Video ön izleme için state
   const [downloadError, setDownloadError] = useState('') // İndirme hatası için state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false) // Mobil menü durumu
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null) // Debounce timer
 
   // Canlı indirme sayacı
@@ -341,16 +342,83 @@ export default function Home() {
           {/* Mobil Header */}
           <div className="md:hidden">
             {/* Mobil Logo Bar */}
-            <div className="flex items-start py-6">
+            <div className="flex items-start justify-between py-6">
               {/* Download İkonlu Logo */}
-              <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
-                <DownloadCloud className="w-6 h-6 text-white" />
+              <div className="flex items-start">
+                <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
+                  <DownloadCloud className="w-6 h-6 text-white" />
+                </div>
+                <h1 className="text-3xl font-black tracking-tight">
+                  <span className="text-lux-purple">Lux</span>
+                  <span className="mx-4 text-white">Social</span>
+                </h1>
               </div>
-              <h1 className="text-3xl font-black tracking-tight">
-                <span className="text-lux-purple">Lux</span>
-                <span className="mx-4 text-white">Social</span>
-              </h1>
+              
+              {/* Mobil Menu Butonu */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors duration-300"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6 text-white" />
+                ) : (
+                  <Menu className="w-6 h-6 text-white" />
+                )}
+              </button>
             </div>
+            
+            {/* Mobil Menu Dropdown */}
+            <AnimatePresence>
+              {isMobileMenuOpen && (
+                <>
+                  {/* Arka Plan Overlay */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="fixed inset-0 bg-black/50 z-[100]"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  />
+                  
+                  {/* Menu Penceresi */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -50 }}
+                    transition={{ duration: 0.3 }}
+                    className="fixed top-16 right-8 left-8 z-[150] animated-gradient-bg rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-2xl"
+                  >
+                    <nav className="space-y-3">
+                      <Link
+                        href="/gizlilik-politikasi"
+                        className="flex items-center space-x-3 text-white hover:text-white/80 transition-colors duration-300 p-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 w-full"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span className="font-medium text-sm">Gizlilik Politikası</span>
+                      </Link>
+                      <Link
+                        href="/hakkinda"
+                        className="flex items-center space-x-3 text-white hover:text-white/80 transition-colors duration-300 p-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 w-full"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Info className="w-4 h-4" />
+                        <span className="font-medium text-sm">Hakkında</span>
+                      </Link>
+                      <Link
+                        href="/kullanim-sartlari"
+                        className="flex items-center space-x-3 text-white hover:text-white/80 transition-colors duration-300 p-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 w-full"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span className="font-medium text-sm">Kullanım Şartları</span>
+                      </Link>
+                    </nav>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
             
             {/* Mobil Platform Seçici - Toolbar Altında */}
             <div className="pb-6 pt-2">

@@ -192,6 +192,21 @@
   }
 }
 
+/* Metin Kırpma için Tailwind Eklentisi */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 @keyframes neonPulse {
   0%, 100% {
     box-shadow: 0 0 8px rgba(103, 22, 223, 0.3), 0 0 16px rgba(103, 22, 223, 0.2), inset 0 0 8px rgba(103, 22, 223, 0.1);

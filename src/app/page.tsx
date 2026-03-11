@@ -253,30 +253,67 @@ export default function Home() {
   // Hızlı yapıştırma fonksiyonu
   const handleQuickPaste = async () => {
     try {
-      // Clipboard'dan metni al
-      const text = await navigator.clipboard.readText()
-      if (text.trim()) {
-        // URL'i ayarla ve doğrula
-        setVideoUrl(text)
-        validateUrl(text, selectedPlatform)
-        
-        // Debounce ile ön izleme yap
-        if (debounceTimerRef.current) {
-          clearTimeout(debounceTimerRef.current)
+      // Mobil cihazlarda clipboard izni kontrolü
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        // Clipboard'dan metni al
+        const text = await navigator.clipboard.readText()
+        if (text.trim()) {
+          // URL'i ayarla ve doğrula
+          setVideoUrl(text)
+          validateUrl(text, selectedPlatform)
+          
+          // Debounce ile ön izleme yap
+          if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current)
+          }
+          
+          if (!urlError) {
+            debounceTimerRef.current = setTimeout(() => {
+              fetchVideoPreview(text, selectedPlatform)
+            }, 500)
+          }
         }
-        
-        if (!urlError) {
-          debounceTimerRef.current = setTimeout(() => {
-            fetchVideoPreview(text, selectedPlatform)
-          }, 500)
+      } else {
+        // Mobil fallback: input'a focus ve yapıştırma isteği
+        const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement
+        if (inputElement) {
+          inputElement.focus()
+          // Mobil klavyeyi aç
+          inputElement.click()
+          // Kısa bir gecikme ile focus tekrar
+          setTimeout(() => {
+            inputElement.focus()
+          }, 100)
         }
       }
     } catch (error) {
       console.error('Yapıştırma hatası:', error)
       // Clipboard erişimi yoksa, manuel giriş için input'a focus
       const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement
-      inputElement?.focus()
+      if (inputElement) {
+        inputElement.focus()
+        inputElement.click()
+        setTimeout(() => {
+          inputElement.focus()
+        }, 100)
+      }
     }
+  }
+
+  // URL'i temizleme fonksiyonu
+  const clearUrl = () => {
+    setVideoUrl('')
+    setUrlError('')
+    setVideoPreview(null)
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+  }
+
+  // Metin kırpma fonksiyonu
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text
+    return text.slice(0, maxLength) + '...'
   }
 
   // Platform değişiklik handler'ı
@@ -290,15 +327,30 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       {/* Animated Background */}
       <div className="fixed inset-0 animated-gradient-bg opacity-10 -z-10"></div>
+      
+      {/* Mobil Menu Overlay - Tüm Sayfayı Kaplar */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/50 z-[998]"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+      
       {/* Header */}
-      <header className="header-gradient shadow-lg relative overflow-hidden">
+      <header className="header-gradient shadow-lg relative overflow-visible">
         {/* Masaüstü: Çapraz Kesim */}
         <div className="hidden md:block absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '45%', left: '-15%'}}></div>
         
         {/* Mobil: Çapraz Kesim */}
         <div className="md:hidden absolute inset-0 bg-white transform -skew-x-12 origin-top-left" style={{width: '45%', left: '-10%'}}></div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 overflow-visible">
           {/* Masaüstü Header */}
           <div className="hidden md:flex items-center justify-between py-6">
             <div className="flex items-center space-x-3">
@@ -340,7 +392,7 @@ export default function Home() {
           </div>
           
           {/* Mobil Header */}
-          <div className="md:hidden">
+          <div className="md:hidden overflow-visible">
             {/* Mobil Logo Bar */}
             <div className="flex items-start justify-between py-6">
               {/* Download İkonlu Logo */}
@@ -371,23 +423,13 @@ export default function Home() {
             <AnimatePresence>
               {isMobileMenuOpen && (
                 <>
-                  {/* Arka Plan Overlay */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="fixed inset-0 bg-black/50 z-[100]"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  />
-                  
                   {/* Menu Penceresi */}
                   <motion.div
                     initial={{ opacity: 0, y: -50 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -50 }}
                     transition={{ duration: 0.3 }}
-                    className="fixed top-16 right-8 left-8 z-[150] animated-gradient-bg rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-2xl"
+                    className="fixed top-16 right-8 left-8 z-[999] animated-gradient-bg rounded-2xl p-4 border border-white/20 backdrop-blur-xl shadow-2xl"
                   >
                     <nav className="space-y-3">
                       <Link
@@ -449,10 +491,10 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             {/* Masaüstü: Tek Satır Başlık */}
             <h2 className="hidden md:block text-5xl font-bold text-gray-900 mb-4">
               {selectedPlatform} Filigransız Video İndirme
@@ -467,7 +509,7 @@ export default function Home() {
             </div>
             
             {/* Açıklama Metni */}
-            <p className="text-xl text-gray-600 mt-4">
+            <p className="text-xl text-gray-600 mt-2">
               {selectedPlatform} ve diğer platformlardan videoları filigransız indirin
             </p>
           </div>
@@ -484,12 +526,34 @@ export default function Home() {
                   value={videoUrl}
                   onChange={handleUrlChangeWithDebounce}
                   placeholder={getPlaceholderForPlatform(selectedPlatform)}
-                  className={`w-full px-6 py-4 pr-32 text-lg border-2 rounded-2xl focus:outline-none transition-colors duration-300 bg-white ${
+                  className={`w-full px-6 py-4 pr-32 text-lg border-2 rounded-2xl focus:outline-none transition-colors duration-300 bg-white md:truncate md:overflow-hidden md:whitespace-nowrap ${
                     urlError 
                       ? 'border-red-500 focus:border-red-600' 
                       : 'border-lux-purple focus:border-lux-purple-dark'
                   }`}
                 />
+                {/* Masaüstü Çarpı Butonu */}
+                {videoUrl && (
+                  <button
+                    onClick={clearUrl}
+                    className="hidden md:flex absolute right-20 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 items-center justify-center"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+                {/* Mobil Çarpı Butonu */}
+                {videoUrl && (
+                  <button
+                    onClick={clearUrl}
+                    className="md:hidden absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors duration-200 p-1"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
                 <button
                   onClick={handleQuickPaste}
                   className="md:absolute md:right-2 md:top-1/2 md:transform md:-translate-y-1/2 animated-gradient-bg md:text-white md:px-4 md:py-2 md:rounded-lg md:hover:scale-105 md:transition-all md:duration-300 md:text-sm md:font-medium md:flex md:items-center md:space-x-2 absolute right-2 top-1/2 transform -translate-y-1/2 animated-gradient-bg text-white p-2 rounded-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
@@ -561,15 +625,15 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
-                  className="bg-white rounded-2xl p-6 border-2 border-lux-purple shadow-lg mt-6"
+                  className="bg-white rounded-2xl p-4 md:p-6 border-2 border-lux-purple shadow-lg mt-6 overflow-hidden"
                 >
-                  <div className="flex items-start space-x-4">
+                  <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-4">
                     {/* Thumbnail */}
                     <div className="relative flex-shrink-0">
                       <img
                         src={videoPreview.thumbnail}
                         alt={videoPreview.title}
-                        className="w-32 h-20 object-cover rounded-lg"
+                        className="w-full h-32 md:w-32 md:h-32 object-cover rounded-lg"
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center">
                         <Eye className="w-6 h-6 text-white" />
@@ -577,11 +641,11 @@ export default function Home() {
                     </div>
                     
                     {/* Video Bilgileri */}
-                    <div className="flex-1">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                        {videoPreview.title}
+                    <div className="flex-1 md:mt-0">
+                      <h4 className="text-base md:text-lg font-semibold text-gray-900 mb-3 line-clamp-2">
+                        {truncateText(videoPreview.title, 50)}
                       </h4>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
                         <span className="flex items-center space-x-1">
                           <Play className="w-4 h-4" />
                           <span>{videoPreview.duration}</span>

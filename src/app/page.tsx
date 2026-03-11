@@ -348,7 +348,7 @@ export default function Home() {
                 <div className="w-10 h-10 animated-gradient-bg rounded-xl flex items-center justify-center shadow-lg border border-white/20 mr-3">
                   <DownloadCloud className="w-6 h-6 text-white" />
                 </div>
-                <h1 className="text-3xl font-black tracking-tight">
+                <h1 className="text-3xl font-black tracking-tight leading-none flex items-center">
                   <span className="text-lux-purple">Lux</span>
                   <span className="mx-4 text-white">Social</span>
                 </h1>

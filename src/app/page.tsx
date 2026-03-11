@@ -148,8 +148,15 @@ export default function Home() {
     }
   }
 
+  // Rüzgar Sörfü TikTok Nota İkonu
+  const TikTokLogo = ({ className = "w-4 h-4" }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 448 512" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a72.59,72.59,0,1,0,72.59,71.18V0h90a208.91,208.91,0,0,0,51,10.15,209,209,0,0,0,49.46,9.1v90.66Z"/>
+    </svg>
+  )
+
   const platforms = [
-    { name: 'TikTok', icon: Play, color: 'bg-black', placeholder: 'https://tiktok.com/@kullanici/video/...', regex: /tiktok\.com/i },
+    { name: 'TikTok', icon: TikTokLogo, color: 'bg-black', placeholder: 'https://tiktok.com/@kullanici/video/...', regex: /tiktok\.com/i },
     { name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-br from-purple-600 to-pink-500', placeholder: 'https://instagram.com/p/...', regex: /instagram\.com/i },
     { name: 'YouTube', icon: Youtube, color: 'bg-red-600', placeholder: 'https://youtube.com/watch?v=...', regex: /youtube\.com/i },
     { name: 'Facebook', icon: Facebook, color: 'bg-blue-600', placeholder: 'https://facebook.com/watch/...', regex: /facebook\.com/i },
@@ -303,6 +310,32 @@ export default function Home() {
                 <span className="animated-gradient-text">Social</span>
               </h1>
             </div>
+            
+            {/* iPhone Tarzı Segment Kontrol - Masaüstü */}
+            <div className="segment-control">
+              <div 
+                className="segment-slider"
+                style={{ 
+                  width: `${100 / platforms.length}%`,
+                  transform: `translateX(${platforms.findIndex(p => p.name === selectedPlatform) * 100}%)`
+                }}
+              ></div>
+              {platforms.map((platform) => {
+                const Icon = platform.icon
+                return (
+                  <button
+                    key={platform.name}
+                    onClick={() => handlePlatformChange(platform.name)}
+                    className={`segment-option ${selectedPlatform === platform.name ? 'active' : 'text-gray-600 hover:text-gray-900'}`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Icon className="w-4 h-4" />
+                      <span>{platform.name}</span>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
           
           {/* Mobil Header */}
@@ -315,7 +348,7 @@ export default function Home() {
               </div>
               <h1 className="text-3xl font-black tracking-tight">
                 <span className="text-lux-purple">Lux</span>
-                <span className="mx-2 text-white">Social</span>
+                <span className="mx-4 text-white">Social</span>
               </h1>
             </div>
             
@@ -363,11 +396,6 @@ export default function Home() {
               <h2 className="text-4xl font-bold text-gray-900 mb-1">
                 {selectedPlatform}
               </h2>
-              
-              {/* Alt Açıklama */}
-              <p className="text-sm font-medium text-gray-600 opacity-80">
-                Filigransız Video İndirme
-              </p>
             </div>
             
             {/* Açıklama Metni */}
@@ -377,7 +405,7 @@ export default function Home() {
           </div>
 
           {/* URL Input Section */}
-          <div className="animated-gradient-bg rounded-3xl shadow-xl p-8 mb-8 border border-white/20">
+          <div className="animated-gradient-bg rounded-3xl shadow-xl p-6 mb-8 border border-white/20">
             <div className="mb-6">
               <label className="block text-lg font-semibold text-white mb-3">
                 Video URL'sini Yapıştırın
@@ -396,12 +424,12 @@ export default function Home() {
                 />
                 <button
                   onClick={handleQuickPaste}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-lux-purple text-white px-4 py-2 rounded-lg hover:bg-lux-purple-dark transition-colors duration-300 text-sm font-medium flex items-center space-x-2"
+                  className="md:absolute md:right-2 md:top-1/2 md:transform md:-translate-y-1/2 animated-gradient-bg md:text-white md:px-4 md:py-2 md:rounded-lg md:hover:scale-105 md:transition-all md:duration-300 md:text-sm md:font-medium md:flex md:items-center md:space-x-2 absolute right-2 top-1/2 transform -translate-y-1/2 animated-gradient-bg text-white p-2 rounded-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="md:w-4 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  <span>Yapıştır</span>
+                  <span className="hidden md:inline">Yapıştır</span>
                 </button>
               </div>
               {urlError && (
@@ -535,64 +563,76 @@ export default function Home() {
             </div>
             <div className="grid md:grid-cols-3 gap-6">
             <div className="animated-gradient-bg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 hover:-translate-y-1 cursor-pointer">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-4">
-                <Download className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Filigransız</h3>
-              <p className="text-white/80">Videoları orijinal kalitesinde ve filigransız indirin</p>
-            </div>
-
-            <div className="animated-gradient-bg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 hover:-translate-y-1 cursor-pointer">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-4">
-                <Play className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Hızlı İndirme</h3>
-              <p className="text-white/80">Saniyeler içinde videoları cihazınıza indirin</p>
-            </div>
-
-            <div className="animated-gradient-bg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 hover:-translate-y-1 cursor-pointer">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-4">
-                <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                  <span className="text-lux-purple text-xs font-bold">✓</span>
+              <div className="md:flex md:items-center flex items-center">
+                <div className="md:w-12 w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center md:mb-4 mr-3">
+                  <Download className="md:w-6 w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="md:text-xl text-lg font-semibold text-white md:mb-2">Filigransız</h3>
+                  <p className="text-white/80 md:text-base text-sm">Videoları orijinal kalitesinde ve filigransız indirin</p>
                 </div>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Ücretsiz</h3>
-              <p className="text-white/80">Tamamen ücretsiz ve sınırsız video indirme</p>
+            </div>
+
+            <div className="animated-gradient-bg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 hover:-translate-y-1 cursor-pointer">
+              <div className="md:flex md:items-center flex items-center">
+                <div className="md:w-12 w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center md:mb-4 mr-3">
+                  <Play className="md:w-6 w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="md:text-xl text-lg font-semibold text-white md:mb-2">Hızlı İndirme</h3>
+                  <p className="text-white/80 md:text-base text-sm">Saniyeler içinde videoları cihazınıza indirin</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="animated-gradient-bg rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:scale-105 hover:-translate-y-1 cursor-pointer">
+              <div className="md:flex md:items-center flex items-center">
+                <div className="md:w-12 w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center md:mb-4 mr-3">
+                  <div className="md:w-6 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-lux-purple text-xs font-bold">✓</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="md:text-xl text-lg font-semibold text-white md:mb-2">Ücretsiz</h3>
+                  <p className="text-white/80 md:text-base text-sm">Tamamen ücretsiz ve sınırsız video indirme</p>
+                </div>
+              </div>
             </div>
             </div>
           </div>
 
           {/* Info Section */}
-          <div className="animated-gradient-bg rounded-3xl p-8 text-center border border-white/20">
+          <div className="animated-gradient-bg rounded-3xl p-6 text-center border border-white/20">
             <h3 className="text-2xl font-bold text-white mb-4">
               Nasıl Çalışır?
             </h3>
             <div className="grid md:grid-cols-3 gap-6 text-left">
-              <div className="flex space-x-4">
-                <div className="w-8 h-8 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="flex md:space-x-4 space-x-3">
+                <div className="md:w-8 w-6 h-6 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xs">
                   1
                 </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4">
-                  <h4 className="font-semibold text-white mb-1">URL Kopyala</h4>
-                  <p className="text-white/80 text-sm">İndirmek istediğiniz video linkini kopyalayın</p>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl md:p-4 p-3">
+                  <h4 className="font-semibold text-white mb-1 md:text-base text-sm">URL Kopyala</h4>
+                  <p className="text-white/80 md:text-sm text-xs">İndirmek istediğiniz video linkini kopyalayın</p>
                 </div>
               </div>
-              <div className="flex space-x-4">
-                <div className="w-8 h-8 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="flex md:space-x-4 space-x-3">
+                <div className="md:w-8 w-6 h-6 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xs">
                   2
                 </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4">
-                  <h4 className="font-semibold text-white mb-1">URL Yapıştır</h4>
-                  <p className="text-white/80 text-sm">Linki yukarıdaki alana yapıştırın</p>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl md:p-4 p-3">
+                  <h4 className="font-semibold text-white mb-1 md:text-base text-sm">URL Yapıştır</h4>
+                  <p className="text-white/80 md:text-sm text-xs">Linki yukarıdaki alana yapıştırın</p>
                 </div>
               </div>
-              <div className="flex space-x-4">
-                <div className="w-8 h-8 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="flex md:space-x-4 space-x-3">
+                <div className="md:w-8 w-6 h-6 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xs">
                   3
                 </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4">
-                  <h4 className="font-semibold text-white mb-1">İndir</h4>
-                  <p className="text-white/80 text-sm">İndirme butonuna tıklayarak videoyu indirin</p>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl md:p-4 p-3">
+                  <h4 className="font-semibold text-white mb-1 md:text-base text-sm">İndir</h4>
+                  <p className="text-white/80 md:text-sm text-xs">İndirme butonuna tıklayarak videoyu indirin</p>
                 </div>
               </div>
             </div>
@@ -619,7 +659,7 @@ export default function Home() {
               </div>
               
               {/* Canlı İndirme Sayacı */}
-              <div className="animated-gradient-bg rounded-2xl px-6 py-4 shadow-lg border border-white/20">
+              <div className="animated-gradient-bg rounded-2xl px-4 py-3 shadow-lg border border-white/20">
                 <div className="flex items-center space-x-3">
                   <Download className="w-5 h-5 text-white" />
                   <div>
@@ -713,7 +753,7 @@ export default function Home() {
           </div>
 
           {/* Alt Bilgi */}
-          <div className="animated-gradient-bg rounded-2xl p-6 shadow-lg border border-white/20">
+          <div className="animated-gradient-bg rounded-2xl p-4 shadow-lg border border-white/20">
             <div className="text-center">
               <p className="text-white text-sm font-medium">
                 © 2026 LuxSocial. Tüm hakları saklıdır.

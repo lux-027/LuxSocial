@@ -320,8 +320,7 @@ export default function Home() {
             </div>
             
             {/* Mobil Platform Seçici - Toolbar Altında */}
-            <div className="pb-4">
-              <p className="text-sm font-semibold text-white/80 mb-3 ml-3">Platform Seçin:</p>
+            <div className="pb-6 pt-2">
               <div className="segment-control">
                 <div 
                   className="segment-slider"

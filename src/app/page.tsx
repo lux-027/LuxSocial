@@ -13,6 +13,7 @@ export default function Home() {
   const [downloadCount, setDownloadCount] = useState(1823)
   const [urlError, setUrlError] = useState('') // Hata mesajı için state
   const [videoPreview, setVideoPreview] = useState<any>(null) // Video ön izleme için state
+  const [isPreviewLoaded, setIsPreviewLoaded] = useState(false) // Önizlemenin yüklenip yüklenmediğini takip eden state
   const [downloadError, setDownloadError] = useState('') // İndirme hatası için state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false) // Mobil menü durumu
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null) // Debounce timer
@@ -196,6 +197,7 @@ export default function Home() {
   // Anında ön izleme için debounce  // Video ön izleme çekme
   const fetchVideoPreview = async (url: string, platform: string) => {
     setIsPreviewLoading(true)
+    setIsPreviewLoaded(false) // Yeni preview yüklenirken state'i sıfırla
     setDownloadError('')
     
     try {
@@ -247,6 +249,7 @@ export default function Home() {
   const handleUrlChangeWithDebounce = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value
     setVideoUrl(url)
+    setIsPreviewLoaded(false) // 🌊 ANINDA PASİF: URL değişirken hemen sıfırla
     validateUrl(url, selectedPlatform)
     
     // Mevcut timer'ı temizle
@@ -319,6 +322,7 @@ export default function Home() {
     setVideoUrl('')
     setUrlError('')
     setVideoPreview(null)
+    setIsPreviewLoaded(false) // 🌊 TEMİZLEME: URL silinince preview state'ini de sıfırla
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current)
     }
@@ -334,6 +338,7 @@ export default function Home() {
   const handlePlatformChange = (platform: string) => {
     setSelectedPlatform(platform)
     setUrlError('') // Platform değişince hatayı temizle
+    setIsPreviewLoaded(false) // 🌊 PLATFORM DEĞİŞİMİ: Platform değişince preview state'ini sıfırla
     validateUrl(videoUrl, platform) // Mevcut URL'i yeni platform için kontrol et
   }
 
@@ -590,13 +595,13 @@ export default function Home() {
             <div className="text-center">
               <button
                 onClick={handleDownload}
-                disabled={!videoUrl.trim() || !!urlError || isLoading}
+                disabled={!(!isLoading && isPreviewLoaded && videoUrl.trim() && !urlError)}
                 className={`
                   py-4 px-16 rounded-2xl text-lg shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-3 mx-auto font-bold
                   ${
-                    !videoUrl.trim() || !!urlError || isLoading
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
-                      : 'animated-gradient-bg text-white shadow-[0_0_25px_rgba(103,22,223,1),0_0_50px_rgba(103,22,223,0.8),0_0_75px_rgba(103,22,223,0.6),inset_0_0_20px_rgba(255,255,255,0.3)]'
+                    !(!isLoading && isPreviewLoaded && videoUrl.trim() && !urlError)
+                      ? 'bg-gray-400 text-white cursor-not-allowed opacity-50'
+                      : 'animated-gradient-bg text-white shadow-[0_0_25px_rgba(103,22,223,1),0_0_50px_rgba(103,22,223,0.8),0_0_75px_rgba(103,22,223,0.6),inset_0_0_20px_rgba(255,255,255,0.3)] transition duration-200 ease-in-out'
                   }
                 }`}
               >
@@ -604,6 +609,11 @@ export default function Home() {
                   <div className="flex items-center justify-center space-x-3">
                     <Loader2 className="w-6 h-6 animate-spin text-white" />
                     <span className="text-white">Video İndiriliyor...</span>
+                  </div>
+                ) : videoPreview && !isPreviewLoaded ? (
+                  <div className="flex items-center justify-center space-x-3">
+                    <Loader2 className="w-6 h-6 animate-spin text-white" />
+                    <span className="text-white">Önizleme Bekleniyor...</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center space-x-3">
@@ -648,6 +658,7 @@ export default function Home() {
                         src={videoPreview.thumbnail}
                         alt={videoPreview.title}
                         className="w-full h-32 md:w-32 md:h-32 object-cover rounded-lg"
+                        onLoad={() => setIsPreviewLoaded(true)}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center">
                         <Eye className="w-6 h-6 text-white" />

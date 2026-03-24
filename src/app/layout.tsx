@@ -58,6 +58,28 @@ export default function RootLayout({
   return (
     <html lang="tr-TR">
       <head>
+        {/* JSON-LD Structured Data for Google SEO - Hidden Logo Integration */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "LuxSocial",
+              "url": "https://luxsocialtr.com",
+              "logo": "https://luxsocialtr.com/luxsociallogo.png",
+              "description": "TikTok, Instagram, YouTube ve Twitter videolarını saniyeler içinde, ücretsiz ve filigransız olarak indir.",
+              "sameAs": [
+                "https://www.instagram.com/luxsocial",
+                "https://www.twitter.com/luxsocial"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service"
+              }
+            })
+          }}
+        />
         <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6964506660604767"
           strategy="afterInteractive"

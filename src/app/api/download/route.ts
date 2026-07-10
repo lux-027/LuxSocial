@@ -70,20 +70,40 @@ async function tryRapidAPI(url: string, platform: string) {
         { params: { videoId, highestQuality: 'true', getTranscript: 'false' }, headers, timeout: 20000 }
       )
       const data = res.data
-      console.log('✅ RAPIDAPI_YT_RAW:', JSON.stringify(data).slice(0, 500))
-      const formats: any[] = data?.formats || data?.streamingData?.formats || data?.adaptiveFormats || []
-      const mp4s = formats.filter((f: any) => f.mimeType?.includes('video/mp4') && f.url)
-        .sort((a: any, b: any) => parseInt(b.quality || b.height || '0') - parseInt(a.quality || a.height || '0'))
-      const best = mp4s[0]
-      const videoUrl = best?.url || data?.url
+      console.log('✅ RAPIDAPI_YT_RAW keys:', Object.keys(data || {}))
+
+      // Response: { contents: [{ videos: [{label, url, metadata}] }] }
+      const allVideos: any[] = (data?.contents || []).flatMap((c: any) => c?.videos || [])
+      console.log('✅ RAPIDAPI_YT_VIDEOS count:', allVideos.length)
+
+      // Önce sesli mp4 ara (has_audio: true), yoksa sadece videolu mp4
+      const withAudio = allVideos.filter((v: any) =>
+        v?.url && v?.metadata?.mime_type?.includes('video/mp4') && v?.metadata?.has_audio === true
+      )
+      const videoOnly = allVideos.filter((v: any) =>
+        v?.url && v?.metadata?.mime_type?.includes('video/mp4') && v?.metadata?.has_audio !== true
+      )
+
+      const candidates = withAudio.length > 0 ? withAudio : videoOnly
+      const best = candidates.sort((a: any, b: any) =>
+        (b?.metadata?.height || 0) - (a?.metadata?.height || 0)
+      )[0]
+
+      const videoUrl = best?.url
       if (videoUrl) {
+        const secs = best?.metadata?.approx_duration_ms
+          ? Math.floor(best.metadata.approx_duration_ms / 1000)
+          : 0
+        const dur = secs > 0
+          ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`
+          : '0:00'
         return {
           success: true,
           downloadUrl: videoUrl,
           thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
           title: data?.title || data?.videoDetails?.title || 'YouTube Video',
-          duration: data?.duration || data?.videoDetails?.lengthSeconds || '0:00',
-          size: best?.qualityLabel || best?.quality || 'Bilinmiyor',
+          duration: dur,
+          size: best?.label || best?.metadata?.quality_label || 'Bilinmiyor',
           platform, api: 'RapidAPI-YT'
         }
       }

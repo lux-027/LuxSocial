@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { FileText, Shield, AlertTriangle, ArrowLeft, Home, DownloadCloud, Cookie, Eye, Lock } from 'lucide-react'
+import Logo from '@/components/Logo'
 
 export default function KullanimSartlari() {
   return (
@@ -10,28 +11,24 @@ export default function KullanimSartlari() {
       <div className="fixed inset-0 animated-gradient-bg opacity-10 -z-10"></div>
       
       {/* Header */}
-      <header className="header-gradient shadow-lg">
-        <div className="container mx-auto px-4 py-6">
+      <header className="bg-white shadow-lg">
+        <div className="container mx-auto px-4 py-4 sm:py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg neon-glow">
-                <FileText className="w-7 h-7 text-lux-purple" />
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">Kullanım Şartları</h1>
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <Logo className="w-10 h-10 sm:w-12 sm:h-12" />
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Kullanım Şartları</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              {/* Mobil Geri Dönüş Butonu */}
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Link 
                 href="/" 
-                className="md:hidden flex items-center space-x-2 text-white hover:text-lux-plum transition-colors duration-300"
+                className="md:hidden flex items-center space-x-1 sm:space-x-2 text-gray-600 hover:text-sky-600 transition-colors duration-300"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span className="text-sm">Geri</span>
               </Link>
-              {/* Masaüstü Ana Sayfa Butonu */}
               <Link 
                 href="/" 
-                className="hidden md:flex items-center space-x-2 text-white hover:text-lux-plum transition-colors duration-300"
+                className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-sky-600 transition-colors duration-300"
               >
                 <Home className="w-5 h-5" />
                 <span>Ana Sayfa</span>
@@ -42,26 +39,28 @@ export default function KullanimSartlari() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-6 sm:py-12">
         <div className="max-w-4xl mx-auto">
           {/* Beyaz İçerik Kutusu */}
-          <div className="bg-white rounded-3xl shadow-2xl border-2 border-lux-purple/20 p-8 md:p-12">
+          <div className="bg-white rounded-3xl shadow-2xl border-2 border-sky-200 p-4 sm:p-8 md:p-12">
             
             {/* Güncelleme Tarihi */}
-            <div className="mb-8 text-center">
-              <p className="text-gray-600 text-sm">
+            <div className="mb-6 sm:mb-8 text-center">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Son Güncelleme: <span className="font-semibold">9 Mart 2026</span>
               </p>
             </div>
 
             {/* İçerik */}
-            <div className="space-y-8 text-gray-700">
+            <div className="space-y-6 sm:space-y-8 text-gray-700 text-sm sm:text-base">
               
               {/* Kabul Edilme */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <Shield className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Kullanım Şartlarının Kabulü</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Kullanım Şartlarının Kabulü</h2>
                 </div>
                 <p className="leading-relaxed">
                   LuxSocial web sitesini ("Hizmet") kullanarak, bu Kullanım Şartları'nı 
@@ -71,9 +70,11 @@ export default function KullanimSartlari() {
 
               {/* Hizmet Tanımı */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <DownloadCloud className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Hizmet Tanımı</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <DownloadCloud className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Hizmet Tanımı</h2>
                 </div>
                 <p className="leading-relaxed">
                   LuxSocial, sosyal medya platformlarından video indirme hizmeti sunan bir web uygulamasıdır. 
@@ -84,14 +85,16 @@ export default function KullanimSartlari() {
 
               {/* Kullanıcı Sorumlulukları */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <AlertTriangle className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Kullanıcı Sorumlulukları</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Kullanıcı Sorumlulukları</h2>
                 </div>
                 <div className="space-y-4">
-                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-                    <p className="font-semibold mb-2">Önemli Uyarı</p>
-                    <p className="text-sm">
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 sm:p-4 rounded">
+                    <p className="font-semibold text-sm sm:text-base mb-2">Önemli Uyarı</p>
+                    <p className="text-xs sm:text-sm">
                       Kullanıcılar, indirdikleri videoların telif haklarına saygı göstermekten 
                       sorumludur. Telifli materyalleri izinsiz indirmek yasa dışıdır.
                     </p>
@@ -108,20 +111,22 @@ export default function KullanimSartlari() {
 
               {/* Fikri Mülkiyet Hakları */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <Lock className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Fikri Mülkiyet Hakları</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Fikri Mülkiyet Hakları</h2>
                 </div>
                 <div className="space-y-4">
                   <p className="leading-relaxed">
                     LuxSocial, platformlarda paylaşılan videoların içeriğinden sorumlu değildir. 
                     Tüm videoların fikri mülkiyet hakları orijinal içerik üreticilerine aittir.
                   </p>
-                  <div className="bg-lux-plum/50 rounded-xl p-4 border border-lux-purple/20">
-                    <h3 className="font-semibold mb-2">Telif Uyarısı</h3>
-                    <p className="text-sm">
+                  <div className="bg-sky-50 rounded-xl p-3 sm:p-4 border border-sky-200">
+                    <h3 className="font-semibold text-sm sm:text-base mb-2">Telif Uyarısı</h3>
+                    <p className="text-xs sm:text-sm">
                       Eğer telif haklarınızı ihlal ettiğimizi düşünüyorsanız, 
-                      lütfen bizimle <span className="text-lux-purple font-semibold">luxtrade.0@gmail.com</span> 
+                      lütfen bizimle <span className="text-sky-600 font-semibold">luxtrade.0@gmail.com</span> 
                       adresinden iletişime geçin. İlgili içerikleri en kısa sürede kaldıracağız.
                     </p>
                   </div>
@@ -130,13 +135,15 @@ export default function KullanimSartlari() {
 
               {/* Hizmet Kullanımı */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <Eye className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Hizmet Kullanımı Kuralları</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Hizmet Kullanımı Kuralları</h2>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Yasaklı Faaliyetler:</h3>
+                    <h3 className="font-semibold text-base sm:text-lg mb-2">Yasaklı Faaliyetler:</h3>
                     <ul className="list-disc list-inside space-y-2 ml-4">
                       <li>Hizmeti yasa dışı amaçlarla kullanmak</li>
                       <li>Zarlı yazılım veya virüs indirmek</li>
@@ -150,21 +157,23 @@ export default function KullanimSartlari() {
 
               {/* Gizlilik ve Veriler */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <Cookie className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Gizlilik ve Veriler</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Cookie className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Gizlilik ve Veriler</h2>
                 </div>
                 <div className="space-y-4">
                   <p className="leading-relaxed">
                     Hizmetimizi kullanırken belirli verileri toplamaktayız. Veri kullanımımız 
-                    hakkında detaylı bilgi için <Link href="/gizlilik-politikasi" className="text-lux-purple hover:underline">Gizlilik Politikası</Link> sayfamızı ziyaret edin.
+                    hakkında detaylı bilgi için <Link href="/gizlilik-politikasi" className="text-sky-600 hover:underline">Gizlilik Politikası</Link> sayfamızı ziyaret edin.
                   </p>
-                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-                    <p className="font-semibold mb-2">Google AdSense</p>
-                    <p className="text-sm">
+                  <div className="bg-sky-50 border-l-4 border-sky-400 p-3 sm:p-4 rounded">
+                    <p className="font-semibold text-sm sm:text-base mb-2">Google AdSense</p>
+                    <p className="text-xs sm:text-sm">
                       Hizmetimizde Google AdSense reklamları bulunmaktadır. Google, 
                       kullanıcı verilerini reklam kişiselleştirme için kullanabilir. 
-                      Reklam ayarlarınızı <a href="https://adssettings.google.com" target="_blank" rel="noopener" className="text-lux-purple hover:underline ml-1">
+                      Reklam ayarlarınızı <a href="https://adssettings.google.com" target="_blank" rel="noopener" className="text-sky-600 hover:underline ml-1">
                         Google Reklam Ayarları
                       </a> sayfasından yönetebilirsiniz.
                     </p>
@@ -174,9 +183,11 @@ export default function KullanimSartlari() {
 
               {/* Hizmet Değişiklikleri */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <FileText className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Hizmet Değişiklikleri</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Hizmet Değişiklikleri</h2>
                 </div>
                 <p className="leading-relaxed">
                   LuxSocial, Hizmeti herhangi bir zamanda değiştirme, askıya alma veya 
@@ -187,9 +198,11 @@ export default function KullanimSartlari() {
 
               {/* Sorumluluk Reddi */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <AlertTriangle className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">Sorumluluk Reddi</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Sorumluluk Reddi</h2>
                 </div>
                 <div className="space-y-4">
                   <p className="leading-relaxed">
@@ -207,13 +220,15 @@ export default function KullanimSartlari() {
 
               {/* İletişim */}
               <section>
-                <div className="flex items-center space-x-3 mb-4">
-                  <Shield className="w-6 h-6 text-lux-purple" />
-                  <h2 className="text-2xl font-bold text-gray-900">İletişim</h2>
+                <div className="flex items-center space-x-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">İletişim</h2>
                 </div>
                 <p className="leading-relaxed">
                   Kullanım şartlarımızla ilgili sorularınız için bize 
-                  <a href="mailto:luxtrade.0@gmail.com" className="text-lux-purple hover:underline ml-1">
+                  <a href="mailto:luxtrade.0@gmail.com" className="text-sky-600 hover:underline ml-1">
                     luxtrade.0@gmail.com
                   </a> 
                   adresinden ulaşabilirsiniz.
@@ -222,15 +237,10 @@ export default function KullanimSartlari() {
 
             </div>
 
-            {/* Ana Sayfaya Dön Butonu */}
-            <div className="mt-12 text-center">
-              <Link 
-                href="/" 
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-lux-purple to-lux-purple-light text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Ana Sayfaya Dön</span>
-              </Link>
+            <div className="mt-8 sm:mt-12 pt-6 border-t border-gray-200 text-center">
+              <p className="text-gray-500 text-xs sm:text-sm">
+                © 2026 LuxSocial. Tüm hakları saklıdır.
+              </p>
             </div>
 
           </div>

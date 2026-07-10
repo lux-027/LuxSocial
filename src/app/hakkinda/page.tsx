@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Info, DownloadCloud, Play, Instagram, Youtube, Facebook, Twitter, ArrowLeft, Home, Shield, Zap, Users } from 'lucide-react'
+import Logo from '@/components/Logo'
 
 export default function Hakkinda() {
   return (
@@ -10,28 +11,24 @@ export default function Hakkinda() {
       <div className="fixed inset-0 animated-gradient-bg opacity-10 -z-10"></div>
       
       {/* Header */}
-      <header className="header-gradient shadow-lg">
+      <header className="bg-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg neon-glow">
-                <Info className="w-7 h-7 text-lux-purple" />
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">Hakkında</h1>
+              <Logo className="w-12 h-12" />
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Hakkında</h1>
             </div>
             <div className="flex items-center space-x-4">
-              {/* Mobil Geri Dönüş Butonu */}
               <Link 
                 href="/" 
-                className="md:hidden flex items-center space-x-2 text-white hover:text-lux-plum transition-colors duration-300"
+                className="md:hidden flex items-center space-x-2 text-gray-600 hover:text-sky-600 transition-colors duration-300"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span className="text-sm">Geri</span>
               </Link>
-              {/* Masaüstü Ana Sayfa Butonu */}
               <Link 
                 href="/" 
-                className="hidden md:flex items-center space-x-2 text-white hover:text-lux-plum transition-colors duration-300"
+                className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-sky-600 transition-colors duration-300"
               >
                 <Home className="w-5 h-5" />
                 <span>Ana Sayfa</span>
@@ -45,12 +42,12 @@ export default function Hakkinda() {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Beyaz İçerik Kutusu */}
-          <div className="bg-white rounded-3xl shadow-2xl border-2 border-lux-purple/20 p-8 md:p-12">
+          <div className="bg-white rounded-3xl shadow-2xl border-2 border-sky-200 p-8 md:p-12">
             
             {/* Hero Section */}
             <div className="text-center mb-12">
               <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-lux-purple to-lux-purple-light rounded-2xl flex items-center justify-center shadow-lg neon-glow">
+                <div className="w-20 h-20 bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl flex items-center justify-center shadow-lg">
                   <DownloadCloud className="w-10 h-10 text-white" />
                 </div>
               </div>
@@ -66,7 +63,9 @@ export default function Hakkinda() {
               {/* Misyonumuz */}
               <section>
                 <div className="flex items-center space-x-3 mb-4">
-                  <Zap className="w-6 h-6 text-lux-purple" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Zap className="w-5 h-5 text-white" />
+                  </div>
                   <h2 className="text-2xl font-bold text-gray-900">Misyonumuz</h2>
                 </div>
                 <p className="leading-relaxed">
@@ -80,35 +79,37 @@ export default function Hakkinda() {
               {/* Desteklenen Platformlar */}
               <section>
                 <div className="flex items-center space-x-3 mb-4">
-                  <Users className="w-6 h-6 text-lux-purple" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
                   <h2 className="text-2xl font-bold text-gray-900">Desteklenen Platformlar</h2>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="bg-lux-plum/50 rounded-xl p-4 border border-lux-purple/20 flex items-center space-x-3">
+                  <div className="bg-sky-50 rounded-xl p-4 border border-sky-200 flex items-center space-x-3">
                     <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
                       <Play className="w-6 h-6 text-white" />
                     </div>
                     <span className="font-semibold">TikTok</span>
                   </div>
-                  <div className="bg-lux-plum/50 rounded-xl p-4 border border-lux-purple/20 flex items-center space-x-3">
+                  <div className="bg-sky-50 rounded-xl p-4 border border-sky-200 flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-lg flex items-center justify-center">
                       <Instagram className="w-6 h-6 text-white" />
                     </div>
                     <span className="font-semibold">Instagram</span>
                   </div>
-                  <div className="bg-lux-plum/50 rounded-xl p-4 border border-lux-purple/20 flex items-center space-x-3">
+                  <div className="bg-sky-50 rounded-xl p-4 border border-sky-200 flex items-center space-x-3">
                     <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
                       <Youtube className="w-6 h-6 text-white" />
                     </div>
                     <span className="font-semibold">YouTube</span>
                   </div>
-                  <div className="bg-lux-plum/50 rounded-xl p-4 border border-lux-purple/20 flex items-center space-x-3">
+                  <div className="bg-sky-50 rounded-xl p-4 border border-sky-200 flex items-center space-x-3">
                     <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                       <Facebook className="w-6 h-6 text-white" />
                     </div>
                     <span className="font-semibold">Facebook</span>
                   </div>
-                  <div className="bg-lux-plum/50 rounded-xl p-4 border border-lux-purple/20 flex items-center space-x-3">
+                  <div className="bg-sky-50 rounded-xl p-4 border border-sky-200 flex items-center space-x-3">
                     <div className="w-10 h-10 bg-sky-500 rounded-lg flex items-center justify-center">
                       <Twitter className="w-6 h-6 text-white" />
                     </div>
@@ -120,13 +121,15 @@ export default function Hakkinda() {
               {/* Özelliklerimiz */}
               <section>
                 <div className="flex items-center space-x-3 mb-4">
-                  <Shield className="w-6 h-6 text-lux-purple" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
                   <h2 className="text-2xl font-bold text-gray-900">Özelliklerimiz</h2>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-lux-purple/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                      <DownloadCloud className="w-4 h-4 text-lux-purple" />
+                    <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <DownloadCloud className="w-4 h-4 text-sky-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Filigransız İndirme</h3>
@@ -136,8 +139,8 @@ export default function Hakkinda() {
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-lux-purple/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                      <Zap className="w-4 h-4 text-lux-purple" />
+                    <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <Zap className="w-4 h-4 text-sky-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Hızlı İndirme</h3>
@@ -147,8 +150,8 @@ export default function Hakkinda() {
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-lux-purple/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                      <Shield className="w-4 h-4 text-lux-purple" />
+                    <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <Shield className="w-4 h-4 text-sky-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Güvenli</h3>
@@ -158,8 +161,8 @@ export default function Hakkinda() {
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-lux-purple/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                      <Users className="w-4 h-4 text-lux-purple" />
+                    <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <Users className="w-4 h-4 text-sky-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-2">Ücretsiz</h3>
@@ -174,12 +177,14 @@ export default function Hakkinda() {
               {/* Nasıl Çalışır? */}
               <section>
                 <div className="flex items-center space-x-3 mb-4">
-                  <Info className="w-6 h-6 text-lux-purple" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Info className="w-5 h-5 text-white" />
+                  </div>
                   <h2 className="text-2xl font-bold text-gray-900">Nasıl Çalışır?</h2>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-lux-purple text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                    <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 shadow-lg">
                       1
                     </div>
                     <div>
@@ -190,7 +195,7 @@ export default function Hakkinda() {
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-lux-purple text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                    <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 shadow-lg">
                       2
                     </div>
                     <div>
@@ -201,7 +206,7 @@ export default function Hakkinda() {
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-lux-purple text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                    <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 shadow-lg">
                       3
                     </div>
                     <div>
@@ -217,13 +222,15 @@ export default function Hakkinda() {
               {/* İletişim */}
               <section>
                 <div className="flex items-center space-x-3 mb-4">
-                  <Info className="w-6 h-6 text-lux-purple" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Info className="w-5 h-5 text-white" />
+                  </div>
                   <h2 className="text-2xl font-bold text-gray-900">İletişim</h2>
                 </div>
                 <p className="leading-relaxed">
                   Sorularınız, önerileriniz veya teknik destek için bize 
-                  <a href="mailto:luxtrade.0@gmail.com" className="text-lux-purple hover:underline ml-1">
-                    luxtrade.0@gmail.com
+                  <a href="mailto:luxsocialtr@gmail.com" className="text-sky-600 hover:underline ml-1">
+                    luxsocialtr@gmail.com
                   </a> 
                   adresinden ulaşabilirsiniz. Mesajlarınız en kısa sürede değerlendirilecektir.
                 </p>
@@ -231,15 +238,10 @@ export default function Hakkinda() {
 
             </div>
 
-            {/* Ana Sayfaya Dön Butonu */}
-            <div className="mt-12 text-center">
-              <Link 
-                href="/" 
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-lux-purple to-lux-purple-light text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Ana Sayfaya Dön</span>
-              </Link>
+            <div className="mt-8 sm:mt-12 pt-6 border-t border-gray-200 text-center">
+              <p className="text-gray-500 text-xs sm:text-sm">
+                © 2026 LuxSocial. Tüm hakları saklıdır.
+              </p>
             </div>
 
           </div>

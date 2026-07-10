@@ -1,15 +1,33 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
+import type { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'LuxSocial | TikTok, Instagram, YouTube Filigransız Video İndir',
-  description: 'TikTok, Instagram, YouTube ve Twitter videolarını saniyeler içinde, ücretsiz ve filigransız (no watermark) olarak indir. LuxSocial ile en yüksek kalitede medya indirme deneyimi.',
-  keywords: 'video indir, tiktok filigransız indir, instagram video downloader, youtube mp4 indir, filigransız video, luxsocial',
+const BASE_URL = 'https://luxsocialtr.com'
+
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'LuxSocial | TikTok, Instagram, YouTube Video İndir - Ücretsiz & Filigransız',
+    template: '%s | LuxSocial',
+  },
+  description: 'TikTok, Instagram, YouTube, Twitter ve Facebook videolarını ücretsiz, filigransız ve yüksek kalitede indirin. LuxSocial ile saniyeler içinde video indirme deneyimi yaşayın.',
+  keywords: [
+    'video indir', 'tiktok video indir', 'tiktok filigransız indir', 'instagram video indir',
+    'youtube video indir', 'twitter video indir', 'facebook video indir',
+    'filigransız video indir', 'ücretsiz video indir', 'tiktok downloader',
+    'instagram downloader', 'youtube downloader', 'video downloader türkçe',
+    'sosyal medya video indir', 'luxsocial', 'lux social'
+  ],
+  authors: [{ name: 'LuxSocial', url: BASE_URL }],
+  creator: 'LuxSocial',
+  publisher: 'LuxSocial',
+  category: 'technology',
+  classification: 'Video Downloader',
   verification: {
-    google: 'x7p7UrXXgoM-nDzCeRywW_MTd21rLFo1DxwTJogTKRg'
+    google: 'x7p7UrXXgoM-nDzCeRywW_MTd21rLFo1DxwTJogTKRg',
   },
   robots: {
     index: true,
@@ -23,16 +41,16 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: 'LuxSocial | TikTok, Instagram, YouTube Filigransız Video İndir',
-    description: 'TikTok, Instagram, YouTube ve Twitter videolarını saniyeler içinde, ücretsiz ve filigransız (no watermark) olarak indir. LuxSocial ile en yüksek kalitede medya indirme deneyimi.',
-    url: 'https://luxsocial.vercel.app',
+    title: 'LuxSocial | TikTok, Instagram, YouTube Video İndir - Ücretsiz & Filigransız',
+    description: 'TikTok, Instagram, YouTube, Twitter ve Facebook videolarını ücretsiz, filigransız ve yüksek kalitede indirin.',
+    url: BASE_URL,
     siteName: 'LuxSocial',
     images: [
       {
-        url: 'https://luxsocial.vercel.app/og-image.jpg',
+        url: `${BASE_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: 'LuxSocial - Filigransız Video İndirme',
+        alt: 'LuxSocial - Ücretsiz Filigransız Video İndirme',
       },
     ],
     locale: 'tr_TR',
@@ -40,13 +58,27 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LuxSocial | TikTok, Instagram, YouTube Filigransız Video İndir',
-    description: 'TikTok, Instagram, YouTube ve Twitter videolarını saniyeler içinde, ücretsiz ve filigransız (no watermark) olarak indir. LuxSocial ile en yüksek kalitede medya indirme deneyimi.',
-    images: ['https://luxsocial.vercel.app/og-image.jpg'],
+    title: 'LuxSocial | TikTok, Instagram, YouTube Video İndir',
+    description: 'TikTok, Instagram, YouTube, Twitter ve Facebook videolarını ücretsiz ve filigransız indirin.',
+    images: [`${BASE_URL}/og-image.jpg`],
+    creator: '@luxsocial',
   },
-  language: 'tr-TR',
+  icons: {
+    icon: [
+      { url: '/logo.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' },
+    ],
+    apple: [
+      { url: '/logo.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+  },
+  manifest: '/manifest.json',
   alternates: {
-    canonical: 'https://luxsocial.vercel.app',
+    canonical: BASE_URL,
+    languages: {
+      'tr-TR': BASE_URL,
+    },
   },
 }
 
@@ -56,28 +88,70 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="tr-TR">
+    <html lang="tr-TR" suppressHydrationWarning>
       <head>
-        {/* JSON-LD Structured Data for Google SEO - Hidden Logo Integration */}
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#0ea5e9" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="LuxSocial" />
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "LuxSocial",
-              "url": "https://luxsocialtr.com",
-              "logo": "https://luxsocialtr.com/luxsociallogo.png",
-              "description": "TikTok, Instagram, YouTube ve Twitter videolarını saniyeler içinde, ücretsiz ve filigransız olarak indir.",
-              "sameAs": [
-                "https://www.instagram.com/luxsocial",
-                "https://www.twitter.com/luxsocial"
-              ],
-              "contactPoint": {
-                "@type": "ContactPoint",
-                "contactType": "customer service"
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "LuxSocial",
+                "url": "https://luxsocialtr.com",
+                "description": "TikTok, Instagram, YouTube, Twitter ve Facebook videolarını ücretsiz ve filigransız indirin.",
+                "inLanguage": "tr-TR",
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": {
+                    "@type": "EntryPoint",
+                    "urlTemplate": "https://luxsocialtr.com/?q={search_term_string}"
+                  },
+                  "query-input": "required name=search_term_string"
+                }
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                "name": "LuxSocial Video Downloader",
+                "url": "https://luxsocialtr.com",
+                "applicationCategory": "MultimediaApplication",
+                "operatingSystem": "Web",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "TRY"
+                },
+                "description": "TikTok, Instagram, YouTube, Twitter ve Facebook videolarını ücretsiz, filigransız ve yüksek kalitede indirin.",
+                "featureList": [
+                  "Filigransız video indirme",
+                  "Ücretsiz kullanım",
+                  "Yüksek kalite",
+                  "TikTok, Instagram, YouTube, Twitter, Facebook desteği"
+                ]
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "LuxSocial",
+                "url": "https://luxsocialtr.com",
+                "logo": "https://luxsocialtr.com/logo.svg",
+                "contactPoint": {
+                  "@type": "ContactPoint",
+                  "email": "luxsocialtr@gmail.com",
+                  "contactType": "customer service",
+                  "availableLanguage": "Turkish"
+                }
               }
-            })
+            ])
           }}
         />
         <Script

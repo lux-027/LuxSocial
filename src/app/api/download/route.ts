@@ -109,8 +109,36 @@ async function tryRapidAPI(url: string, platform: string) {
       }
       throw new Error('RapidAPI YT: video URL bulunamadı')
 
+    } else if (platform === 'Instagram') {
+      // GET /instagram/media - Get-Instagram-Media-Post-Details
+      const shortcode = url.match(/(?:reel|p|tv)\/([A-Za-z0-9_-]+)/)?.[1]
+      if (!shortcode) throw new Error('Instagram shortcode bulunamadı')
+      res = await axios.get(
+        `https://${RAPIDAPI_HOST}/instagram/media`,
+        { params: { shortcode }, headers, timeout: 20000 }
+      )
+      const data = res.data
+      console.log('✅ RAPIDAPI_IG_RAW:', JSON.stringify(data).slice(0, 600))
+      // Olası response alanları
+      const videoUrl =
+        data?.video_url ||
+        data?.videos?.[0]?.url ||
+        data?.media?.[0]?.video_url ||
+        data?.items?.[0]?.video_url ||
+        data?.data?.video_url
+      if (videoUrl) {
+        return {
+          success: true,
+          downloadUrl: videoUrl,
+          thumbnail: data?.thumbnail_url || data?.display_url || data?.image_url || '',
+          title: data?.caption?.text?.slice(0, 80) || data?.title || 'Instagram Video',
+          duration: '0:00', size: 'Bilinmiyor',
+          platform, api: 'RapidAPI-IG'
+        }
+      }
+      throw new Error('RapidAPI IG: video URL bulunamadı')
+
     } else {
-      // Instagram, Twitter, Facebook — bu API sadece YouTube destekliyor
       throw new Error('RapidAPI: bu platform için endpoint yok, fallback kullan')
     }
   } catch (error: any) {

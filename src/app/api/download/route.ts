@@ -45,98 +45,102 @@ async function tryTikWM(url: string) {
   }
 }
 
-// Instagram — embed sayfasından og:video scrape et
+// Instagram — shortcode'dan graphql endpoint ile video URL çek
 async function trySaveInsta(url: string) {
   try {
-    // URL'yi temizle: sadece post/reel kısmını al
-    const cleanUrl = url.split('?')[0].replace(/\/$/, '')
-    const embedUrl = `${cleanUrl}/embed/`
-    console.log('🚀 INSTAGRAM_EMBED_DENENIYOR:', embedUrl)
+    const shortcode = url.match(/(?:reel|p|tv)\/([A-Za-z0-9_-]+)/)?.[1]
+    if (!shortcode) throw new Error('Instagram shortcode bulunamadı')
+    console.log('🚀 INSTAGRAM_GRAPHQL_DENENIYOR shortcode:', shortcode)
 
-    const response = await axios.get(embedUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-      timeout: 15000,
-      maxRedirects: 5,
-    })
+    // Instagram'ın resmi embed JSON endpoint'i
+    const res = await axios.get(
+      `https://www.instagram.com/p/${shortcode}/?__a=1&__d=dis`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
+          'Accept': 'application/json, text/plain, */*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': 'https://www.instagram.com/',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        timeout: 15000,
+      }
+    )
 
-    const html: string = typeof response.data === 'string' ? response.data : ''
-    console.log('✅ EMBED_HTML slice:', html.slice(0, 600))
+    console.log('✅ INSTAGRAM_GRAPHQL_RAW:', JSON.stringify(res.data).slice(0, 500))
+    const item = res.data?.items?.[0] || res.data?.graphql?.shortcode_media || res.data
+    const videoUrl =
+      item?.video_url ||
+      item?.video_versions?.[0]?.url ||
+      item?.carousel_media?.[0]?.video_versions?.[0]?.url
 
-    // video_url veya src'yi bul
-    const videoMatch =
-      html.match(/"video_url":"([^"]+)"/) ||
-      html.match(/property="og:video"[^>]+content="([^"]+)"/) ||
-      html.match(/<video[^>]+src="([^"]+)"/)
+    const thumbnail =
+      item?.image_versions2?.candidates?.[0]?.url ||
+      item?.thumbnail_url ||
+      item?.display_url || ''
 
-    const thumbMatch =
-      html.match(/"display_url":"([^"]+)"/) ||
-      html.match(/property="og:image"[^>]+content="([^"]+)"/)
+    const title = item?.caption?.text?.slice(0, 80) || 'Instagram Video'
 
-    const titleMatch = html.match(/property="og:title"[^>]+content="([^"]+)"/)
-
-    const rawVideoUrl = videoMatch?.[1]
-    if (rawVideoUrl) {
-      const videoUrl = rawVideoUrl.replace(/\\u0026/g, '&').replace(/\\/g, '')
-      const thumbnail = thumbMatch?.[1]?.replace(/\\u0026/g, '&').replace(/\\/g, '') || ''
+    if (videoUrl) {
       return {
         success: true,
         downloadUrl: videoUrl,
         thumbnail,
-        title: titleMatch?.[1] || 'Instagram Video',
+        title,
         duration: '0:00',
         size: 'Bilinmiyor',
         platform: 'Instagram',
-        api: 'InstaEmbed'
+        api: 'InstaGraphQL'
       }
     }
-    throw new Error('Embed: video linki bulunamadı')
+    throw new Error('GraphQL: video_url bulunamadı')
   } catch (error: any) {
-    console.error('🚨 INSTAGRAM_EMBED_HATASI:', error.message)
+    console.error('🚨 INSTAGRAM_GRAPHQL_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// Instagram yedek — picnob.com scraping
+// Instagram yedek — oembed + ssig proxy
 async function trySnapInsta(url: string) {
   try {
-    console.log('🚀 PICNOB_DENENIYOR:', url)
-    const shortcode = url.match(/(?:reel|p)\/([A-Za-z0-9_-]+)/)?.[1]
+    const shortcode = url.match(/(?:reel|p|tv)\/([A-Za-z0-9_-]+)/)?.[1]
     if (!shortcode) throw new Error('Instagram shortcode bulunamadı')
+    console.log('🚀 INSTAGRAM_OEMBED_DENENIYOR shortcode:', shortcode)
 
-    const response = await axios.get(
-      `https://www.picnob.com/post/${shortcode}/`,
+    // oEmbed thumbnail al, video için embed HTML'i parse et
+    const oembedRes = await axios.get(
+      `https://www.instagram.com/api/v1/oembed/?url=${encodeURIComponent(url)}&maxwidth=640`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': 'text/html',
-          'Referer': 'https://www.picnob.com/'
+          'Accept': 'application/json',
         },
-        timeout: 15000
+        timeout: 10000,
       }
     )
-    const html: string = typeof response.data === 'string' ? response.data : ''
-    console.log('✅ PICNOB_RAW slice:', html.slice(0, 400))
-    const videoMatch = html.match(/<video[^>]+src="([^"]+\.mp4[^"]*)"/) ||
-      html.match(/data-src="([^"]+\.mp4[^"]*)"/)
+    console.log('✅ OEMBED_RAW:', JSON.stringify(oembedRes.data).slice(0, 300))
+    const thumbnail = oembedRes.data?.thumbnail_url || ''
+    const title = oembedRes.data?.title || 'Instagram Video'
+
+    // Embed HTML içindeki video_url'yi çıkarmaya çalış
+    const embedHtml: string = oembedRes.data?.html || ''
+    const videoMatch = embedHtml.match(/"video_url":"([^"]+)"/)
     if (videoMatch?.[1]) {
+      const videoUrl = videoMatch[1].replace(/\\u0026/g, '&').replace(/\\/g, '')
       return {
         success: true,
-        downloadUrl: videoMatch[1],
-        thumbnail: '',
-        title: 'Instagram Video',
+        downloadUrl: videoUrl,
+        thumbnail,
+        title,
         duration: '0:00',
         size: 'Bilinmiyor',
         platform: 'Instagram',
-        api: 'Picnob'
+        api: 'InstaOEmbed'
       }
     }
-    throw new Error('Picnob: video linki bulunamadı')
+    throw new Error('oEmbed: video_url bulunamadı')
   } catch (error: any) {
-    console.error('🚨 PICNOB_HATASI:', error.message)
+    console.error('🚨 INSTAGRAM_OEMBED_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }

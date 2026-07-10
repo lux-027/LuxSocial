@@ -195,17 +195,17 @@ export default function HomePage() {
                       navigator.clipboard.writeText(window.location.href)
                     }
                   }}
-                  className="p-2 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
+                  className="p-2.5 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
                   aria-label="Paylaş"
                 >
-                  <Share2 className="w-5 h-5" />
+                  <Share2 className="w-6 h-6" />
                 </button>
                 <button
                   onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                  className="p-2 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
+                  className="p-2.5 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
                   aria-label={isDrawerOpen ? "Menüyü kapat" : "Menüyü aç"}
                 >
-                  {isDrawerOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                  {isDrawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
               </div>
             </div>

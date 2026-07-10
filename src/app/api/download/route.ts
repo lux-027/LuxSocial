@@ -45,189 +45,255 @@ async function tryTikWM(url: string) {
   }
 }
 
+// SaveInsta API (Instagram için)
+async function trySaveInsta(url: string) {
+  try {
+    console.log('🚀 SAVEINSTA_API_DENEMESI_BASLADI:', url)
+    const formData = new URLSearchParams()
+    formData.append('url', url)
+    const response = await axios.post(
+      'https://v3.saveig.app/api/ajaxSearch',
+      formData.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': '*/*',
+          'Origin': 'https://saveig.app',
+          'Referer': 'https://saveig.app/'
+        },
+        timeout: 15000
+      }
+    )
+    console.log('✅ SAVEINSTA_RAW:', JSON.stringify(response.data).slice(0, 200))
+    const data = response.data
+    if (data?.status === 'ok' && data?.data) {
+      // HTML parse yerine video linkini bul
+      const html: string = data.data
+      const videoMatch = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/)
+      const thumbMatch = html.match(/src="(https:\/\/[^"]+\.(jpg|jpeg|png|webp)[^"]*)"/)
+      if (videoMatch) {
+        return {
+          success: true,
+          downloadUrl: videoMatch[1],
+          thumbnail: thumbMatch ? thumbMatch[1] : '',
+          title: 'Instagram Video',
+          duration: '0:00',
+          size: 'Bilinmiyor',
+          platform: 'Instagram',
+          api: 'SaveInsta'
+        }
+      }
+    }
+    throw new Error('SaveInsta: video linki bulunamadı')
+  } catch (error: any) {
+    console.error('🚨 SAVEINSTA_HATASI:', error.message)
+    return { success: false, error: error.message }
+  }
+}
+
+// SnapInsta API (Instagram yedek)
+async function trySnapInsta(url: string) {
+  try {
+    console.log('🚀 SNAPINSTA_API_DENEMESI_BASLADI:', url)
+    const formData = new URLSearchParams()
+    formData.append('url', url)
+    formData.append('lang', 'tr')
+    const response = await axios.post(
+      'https://snapinsta.app/action.php',
+      formData.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Origin': 'https://snapinsta.app',
+          'Referer': 'https://snapinsta.app/'
+        },
+        timeout: 15000
+      }
+    )
+    console.log('✅ SNAPINSTA_RAW:', JSON.stringify(response.data).slice(0, 200))
+    const html: string = typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
+    const videoMatch = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/)
+    const thumbMatch = html.match(/src="(https:\/\/[^"]+\.(jpg|jpeg|png|webp)[^"]*)"/)
+    if (videoMatch) {
+      return {
+        success: true,
+        downloadUrl: videoMatch[1],
+        thumbnail: thumbMatch ? thumbMatch[1] : '',
+        title: 'Instagram Video',
+        duration: '0:00',
+        size: 'Bilinmiyor',
+        platform: 'Instagram',
+        api: 'SnapInsta'
+      }
+    }
+    throw new Error('SnapInsta: video linki bulunamadı')
+  } catch (error: any) {
+    console.error('🚨 SNAPINSTA_HATASI:', error.message)
+    return { success: false, error: error.message }
+  }
+}
+
 // Facebook API (Facebook Video)
 async function tryFacebook(url: string) {
   try {
     console.log('🚀 FACEBOOK_API_DENEMESI_BASLADI:', url)
-    
+    // fdown.net API
+    const formData = new URLSearchParams()
+    formData.append('id', url)
     const response = await axios.post(
-      'https://api.cobalt.tools/api/json',
-      { url: url },
+      'https://fdown.net/download.php',
+      formData.toString(),
       {
-        headers: ANTI_BOT_HEADERS,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Origin': 'https://fdown.net',
+          'Referer': 'https://fdown.net/'
+        },
         timeout: 15000
       }
     )
-
-    console.log('✅ FACEBOOK_API_BASARILI:', response.data)
-    
-    if (response.data?.status === 'ok') {
-      const videoData = response.data
+    console.log('✅ FDOWN_RAW:', JSON.stringify(response.data).slice(0, 300))
+    const html: string = typeof response.data === 'string' ? response.data : ''
+    // HD link dene
+    const hdMatch = html.match(/a[^>]+href="(https:\/\/[^"]+)"\ [^>]*>[^<]*HD/i)
+    const sdMatch = html.match(/a[^>]+href="(https:\/\/[^"]+)"\ [^>]*>[^<]*SD/i)
+    const anyMatch = html.match(/href="(https:\/\/video[^"]+)"/)
+    const link = hdMatch?.[1] || sdMatch?.[1] || anyMatch?.[1]
+    if (link) {
       return {
         success: true,
-        downloadUrl: videoData.url,
-        thumbnail: videoData.thumbnail || '',
-        title: videoData.filename || 'Facebook Video',
-        duration: videoData.duration || '0:00',
-        size: videoData.size ? `${(videoData.size / 1024 / 1024).toFixed(1)} MB` : 'Bilinmiyor',
+        downloadUrl: link,
+        thumbnail: '',
+        title: 'Facebook Video',
+        duration: '0:00',
+        size: 'Bilinmiyor',
         platform: 'Facebook',
-        api: 'Cobalt'
+        api: 'FDown'
       }
-    } else {
-      throw new Error(response.data?.error || 'Facebook API geçersiz yanıt döndürdü')
     }
+    throw new Error('FDown: video linki bulunamadı')
   } catch (error: any) {
-    console.error('🚨 FACEBOOK_API_HATASI:', error.message, error.response?.data || error)
+    console.error('🚨 FACEBOOK_API_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// Instagram API (Instagram Video/Reels)
+// Instagram API — çift motor: SaveInsta → SnapInsta
 async function tryInstagram(url: string) {
-  try {
-    console.log('🚀 INSTAGRAM_API_DENEMESI_BASLADI:', url)
-    
-    const response = await axios.post(
-      'https://api.cobalt.tools/api/json',
-      { url: url },
-      {
-        headers: ANTI_BOT_HEADERS,
-        timeout: 15000
-      }
-    )
-
-    console.log('✅ INSTAGRAM_API_BASARILI:', response.data)
-    
-    if (response.data?.status === 'ok') {
-      const videoData = response.data
-      return {
-        success: true,
-        downloadUrl: videoData.url,
-        thumbnail: videoData.thumbnail || '',
-        title: videoData.filename || 'Instagram Video',
-        duration: videoData.duration || '0:00',
-        size: videoData.size ? `${(videoData.size / 1024 / 1024).toFixed(1)} MB` : 'Bilinmiyor',
-        platform: 'Instagram',
-        api: 'Cobalt'
-      }
-    } else {
-      throw new Error(response.data?.error || 'Instagram API geçersiz yanıt döndürdü')
-    }
-  } catch (error: any) {
-    console.error('🚨 INSTAGRAM_API_HATASI:', error.message, error.response?.data || error)
-    return { success: false, error: error.message }
-  }
+  const r1 = await trySaveInsta(url)
+  if (r1.success) return r1
+  console.log('⚠️ SaveInsta başarısız, SnapInsta deneniyor...')
+  return await trySnapInsta(url)
 }
 
-// YouTube API (YouTube Shorts/Video)
+// YouTube API — y2api + yt1s fallback
 async function tryYouTube(url: string) {
   try {
     console.log('🚀 YOUTUBE_API_DENEMESI_BASLADI:', url)
+    // yt1s.com API
+    const videoId = url.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{11})/)?.[1]
+    if (!videoId) throw new Error('YouTube video ID bulunamadı')
     
-    const response = await axios.post(
-      'https://api.cobalt.tools/api/json',
-      { url: url },
+    // 1. Aşama: analiz isteği
+    const analyzeRes = await axios.post(
+      'https://yt1s.com/api/ajaxSearch/index',
+      new URLSearchParams({ q: url, vt: 'home' }).toString(),
       {
-        headers: ANTI_BOT_HEADERS,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Origin': 'https://yt1s.com',
+          'Referer': 'https://yt1s.com/'
+        },
         timeout: 15000
       }
     )
-
-    console.log('✅ YOUTUBE_API_BASARILI:', response.data)
+    console.log('✅ YT1S_ANALYZE:', JSON.stringify(analyzeRes.data).slice(0, 300))
+    const analyzeData = analyzeRes.data
+    if (!analyzeData?.vid || !analyzeData?.kc) throw new Error('YT1S analiz başarısız')
     
-    if (response.data?.status === 'ok') {
-      const videoData = response.data
+    // 2. Aşama: indirme linki al (mp4 720p veya en iyi)
+    const convertRes = await axios.post(
+      'https://yt1s.com/api/ajaxConvert/convert',
+      new URLSearchParams({ vid: analyzeData.vid, k: analyzeData.kc }).toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Origin': 'https://yt1s.com',
+          'Referer': 'https://yt1s.com/'
+        },
+        timeout: 20000
+      }
+    )
+    console.log('✅ YT1S_CONVERT:', JSON.stringify(convertRes.data).slice(0, 300))
+    const convertData = convertRes.data
+    if (convertData?.status === 'ok' && convertData?.dlink) {
       return {
         success: true,
-        downloadUrl: videoData.url,
-        thumbnail: videoData.thumbnail || '',
-        title: videoData.filename || 'YouTube Video',
-        duration: videoData.duration || '0:00',
-        size: videoData.size ? `${(videoData.size / 1024 / 1024).toFixed(1)} MB` : 'Bilinmiyor',
+        downloadUrl: convertData.dlink,
+        thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+        title: analyzeData.title || 'YouTube Video',
+        duration: analyzeData.t || '0:00',
+        size: 'Bilinmiyor',
         platform: 'YouTube',
-        api: 'Cobalt'
+        api: 'YT1S'
       }
-    } else {
-      throw new Error(response.data?.error || 'YouTube API geçersiz yanıt döndürdü')
     }
+    throw new Error('YT1S: indirme linki alınamadı')
   } catch (error: any) {
-    console.error('🚨 YOUTUBE_API_HATASI:', error.message, error.response?.data || error)
+    console.error('🚨 YOUTUBE_API_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// X/Twitter API
+// X/Twitter API — twitsave.com
 async function tryXTwitter(url: string) {
   try {
-    console.log('🚀 X_TWITTER_API_DENEMESI_BASLADI:', url)
-    
-    const response = await axios.post(
-      'https://api.cobalt.tools/api/json',
-      { url: url },
+    console.log('� X_TWITTER_API_DENEMESI_BASLADI:', url)
+    const response = await axios.get(
+      `https://twitsave.com/info?url=${encodeURIComponent(url)}`,
       {
-        headers: ANTI_BOT_HEADERS,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Referer': 'https://twitsave.com/'
+        },
         timeout: 15000
       }
     )
-
-    console.log('✅ X_TWITTER_API_BASARILI:', response.data)
-    
-    if (response.data?.status === 'ok') {
-      const videoData = response.data
+    console.log('✅ TWITSAVE_RAW:', String(response.data).slice(0, 400))
+    const html: string = typeof response.data === 'string' ? response.data : ''
+    // En yüksek kalite mp4 linki bul
+    const videoMatch = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/)
+    const thumbMatch = html.match(/<img[^>]+src="(https:\/\/pbs\.twimg\.com[^"]+)"/)
+    const titleMatch = html.match(/<title>([^<]+)<\/title>/)
+    if (videoMatch) {
       return {
         success: true,
-        downloadUrl: videoData.url,
-        thumbnail: videoData.thumbnail || '',
-        title: videoData.filename || 'X/Twitter Video',
-        duration: videoData.duration || '0:00',
-        size: videoData.size ? `${(videoData.size / 1024 / 1024).toFixed(1)} MB` : 'Bilinmiyor',
+        downloadUrl: videoMatch[1],
+        thumbnail: thumbMatch ? thumbMatch[1] : '',
+        title: titleMatch ? titleMatch[1].replace(' - TwitSave', '').trim() : 'Twitter Video',
+        duration: '0:00',
+        size: 'Bilinmiyor',
         platform: 'X / Twitter',
-        api: 'Cobalt'
+        api: 'TwitSave'
       }
-    } else {
-      throw new Error(response.data?.error || 'X/Twitter API geçersiz yanıt döndürdü')
     }
+    throw new Error('TwitSave: video linki bulunamadı')
   } catch (error: any) {
-    console.error('🚨 X_TWITTER_API_HATASI:', error.message, error.response?.data || error)
+    console.error('🚨 X_TWITTER_API_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// Cobalt API (Yedek Motor)
+// TikWM yedek (TikTok fallback)
 async function tryCobalt(url: string) {
-  try {
-    console.log('🔄 COBALT_API_DENEMESI_BASLADI:', url)
-    
-    const response = await axios.post(
-      'https://api.cobalt.tools/api/json',
-      { url: url },
-      {
-        headers: ANTI_BOT_HEADERS,
-        timeout: 15000
-      }
-    )
-
-    console.log('✅ COBALT_API_BASARILI:', response.data)
-    
-    if (response.data?.status === 'ok') {
-      const videoData = response.data
-      return {
-        success: true,
-        downloadUrl: videoData.url,
-        thumbnail: videoData.thumbnail || '',
-        title: videoData.filename || 'TikTok Video',
-        duration: videoData.duration || '0:00',
-        size: videoData.size ? `${(videoData.size / 1024 / 1024).toFixed(1)} MB` : 'Bilinmiyor',
-        platform: 'TikTok',
-        api: 'Cobalt'
-      }
-    } else {
-      throw new Error(response.data?.error || 'Cobalt API geçersiz yanıt döndürdü')
-    }
-  } catch (error: any) {
-    console.error('🚨 COBALT_API_HATASI:', error.message, error.response?.data || error)
-    return { success: false, error: error.message }
-  }
+  // TikTok için sadece TikWM yedek olarak kullan
+  return await tryTikWM(url)
 }
 
 export async function POST(request: NextRequest) {

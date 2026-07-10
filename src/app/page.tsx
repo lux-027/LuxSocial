@@ -105,7 +105,7 @@ export default function HomePage() {
               <Logo className="w-12 h-12" />
               <h1 className="text-4xl font-black tracking-tight">
                 <span className="text-sky-600">Lux</span>
-                <span className="text-sky-600">Social</span>
+                <span className="text-gray-900">Social</span>
               </h1>
             </div>
             

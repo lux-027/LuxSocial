@@ -109,74 +109,10 @@ async function tryRapidAPI(url: string, platform: string) {
       }
       throw new Error('RapidAPI YT: video URL bulunamadı')
 
-    } else if (platform === 'Instagram') {
-      const shortcode = url.match(/(?:reel|p|tv)\/([A-Za-z0-9_-]+)/)?.[1]
-      if (!shortcode) throw new Error('Instagram shortcode bulunamadı')
-      res = await axios.get(
-        `https://${RAPIDAPI_HOST}/instagram/media`,
-        { params: { shortcode }, headers, timeout: 20000 }
-      )
-      const data = res.data
-      console.log('✅ RAPIDAPI_IG_RAW:', JSON.stringify(data).slice(0, 500))
-      const videoUrl = data?.video_url || data?.url ||
-        data?.media?.[0]?.video_url || data?.items?.[0]?.video_url
-      if (videoUrl) {
-        return {
-          success: true,
-          downloadUrl: videoUrl,
-          thumbnail: data?.thumbnail_url || data?.display_url || '',
-          title: data?.caption || data?.title || 'Instagram Video',
-          duration: '0:00', size: 'Bilinmiyor',
-          platform, api: 'RapidAPI-IG'
-        }
-      }
-      throw new Error('RapidAPI IG: video URL bulunamadı')
-
-    } else if (platform === 'X / Twitter') {
-      res = await axios.get(
-        `https://${RAPIDAPI_HOST}/twitter/media`,
-        { params: { url }, headers, timeout: 20000 }
-      )
-      const data = res.data
-      console.log('✅ RAPIDAPI_TW_RAW:', JSON.stringify(data).slice(0, 500))
-      const videos: any[] = data?.media?.videos || data?.videos || []
-      const best = videos.sort((a: any, b: any) =>
-        parseInt(b.bitrate || '0') - parseInt(a.bitrate || '0'))[0]
-      const videoUrl = best?.url || data?.url
-      if (videoUrl) {
-        return {
-          success: true,
-          downloadUrl: videoUrl,
-          thumbnail: data?.thumbnail || '',
-          title: data?.text || data?.title || 'Twitter Video',
-          duration: '0:00', size: 'Bilinmiyor',
-          platform, api: 'RapidAPI-TW'
-        }
-      }
-      throw new Error('RapidAPI TW: video URL bulunamadı')
-
-    } else if (platform === 'Facebook') {
-      res = await axios.get(
-        `https://${RAPIDAPI_HOST}/facebook/media`,
-        { params: { url }, headers, timeout: 20000 }
-      )
-      const data = res.data
-      console.log('✅ RAPIDAPI_FB_RAW:', JSON.stringify(data).slice(0, 500))
-      const videoUrl = data?.hd || data?.sd || data?.url
-      if (videoUrl) {
-        return {
-          success: true,
-          downloadUrl: videoUrl,
-          thumbnail: data?.thumbnail || '',
-          title: data?.title || 'Facebook Video',
-          duration: '0:00', size: data?.hd ? 'HD' : 'SD',
-          platform, api: 'RapidAPI-FB'
-        }
-      }
-      throw new Error('RapidAPI FB: video URL bulunamadı')
+    } else {
+      // Instagram, Twitter, Facebook — bu API sadece YouTube destekliyor
+      throw new Error('RapidAPI: bu platform için endpoint yok, fallback kullan')
     }
-
-    throw new Error('RapidAPI: desteklenmeyen platform')
   } catch (error: any) {
     console.error('🚨 RAPIDAPI_HATASI:', platform, error.message, error.response?.data)
     return { success: false, error: error.message }
@@ -238,47 +174,41 @@ async function trySaveInsta(url: string) {
   }
 }
 
-// Instagram yedek — oembed + ssig proxy
+// Instagram yedek — igram.io scraping
 async function trySnapInsta(url: string) {
   try {
-    const shortcode = url.match(/(?:reel|p|tv)\/([A-Za-z0-9_-]+)/)?.[1]
-    if (!shortcode) throw new Error('Instagram shortcode bulunamadı')
-    console.log('🚀 INSTAGRAM_OEMBED_DENENIYOR shortcode:', shortcode)
-
-    // oEmbed thumbnail al, video için embed HTML'i parse et
-    const oembedRes = await axios.get(
-      `https://www.instagram.com/api/v1/oembed/?url=${encodeURIComponent(url)}&maxwidth=640`,
+    console.log('🚀 IGRAM_DENENIYOR:', url)
+    const res = await axios.post(
+      'https://igram.world/api/convert',
+      new URLSearchParams({ url }),
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': 'application/json',
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://igram.world',
+          'Referer': 'https://igram.world/',
         },
-        timeout: 10000,
+        timeout: 15000,
       }
     )
-    console.log('✅ OEMBED_RAW:', JSON.stringify(oembedRes.data).slice(0, 300))
-    const thumbnail = oembedRes.data?.thumbnail_url || ''
-    const title = oembedRes.data?.title || 'Instagram Video'
-
-    // Embed HTML içindeki video_url'yi çıkarmaya çalış
-    const embedHtml: string = oembedRes.data?.html || ''
-    const videoMatch = embedHtml.match(/"video_url":"([^"]+)"/)
-    if (videoMatch?.[1]) {
-      const videoUrl = videoMatch[1].replace(/\\u0026/g, '&').replace(/\\/g, '')
+    console.log('✅ IGRAM_RAW:', JSON.stringify(res.data).slice(0, 400))
+    const items: any[] = res.data?.data || res.data?.links || []
+    const video = items.find((i: any) => i?.type?.includes('video') || i?.url?.includes('.mp4'))
+    const videoUrl = video?.url || res.data?.url
+    if (videoUrl) {
       return {
         success: true,
         downloadUrl: videoUrl,
-        thumbnail,
-        title,
-        duration: '0:00',
-        size: 'Bilinmiyor',
-        platform: 'Instagram',
-        api: 'InstaOEmbed'
+        thumbnail: res.data?.thumbnail || '',
+        title: res.data?.title || 'Instagram Video',
+        duration: '0:00', size: 'Bilinmiyor',
+        platform: 'Instagram', api: 'Igram'
       }
     }
-    throw new Error('oEmbed: video_url bulunamadı')
+    throw new Error('Igram: video URL bulunamadı')
   } catch (error: any) {
-    console.error('🚨 INSTAGRAM_OEMBED_HATASI:', error.message)
+    console.error('🚨 IGRAM_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }

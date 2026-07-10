@@ -45,6 +45,124 @@ async function tryTikWM(url: string) {
   }
 }
 
+// RapidAPI — social-media-video-downloader by Emmanuel
+const RAPIDAPI_HOST = 'social-media-video-downloader.p.rapidapi.com'
+
+async function tryRapidAPI(url: string, platform: string) {
+  const key = process.env.RAPIDAPI_KEY
+  if (!key) return { success: false, error: 'RapidAPI key yok' }
+
+  const headers = {
+    'X-RapidAPI-Key': key,
+    'X-RapidAPI-Host': RAPIDAPI_HOST,
+    'Content-Type': 'application/json',
+  }
+
+  try {
+    console.log('🚀 RAPIDAPI_DENENIYOR:', platform, url)
+    let res: any
+
+    if (platform === 'YouTube') {
+      const videoId = url.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{11})/)?.[1]
+      if (!videoId) throw new Error('YouTube video ID bulunamadı')
+      res = await axios.get(
+        `https://${RAPIDAPI_HOST}/youtube/v3/video/details`,
+        { params: { videoId, highestQuality: 'true', getTranscript: 'false' }, headers, timeout: 20000 }
+      )
+      const data = res.data
+      console.log('✅ RAPIDAPI_YT_RAW:', JSON.stringify(data).slice(0, 500))
+      const formats: any[] = data?.formats || data?.streamingData?.formats || data?.adaptiveFormats || []
+      const mp4s = formats.filter((f: any) => f.mimeType?.includes('video/mp4') && f.url)
+        .sort((a: any, b: any) => parseInt(b.quality || b.height || '0') - parseInt(a.quality || a.height || '0'))
+      const best = mp4s[0]
+      const videoUrl = best?.url || data?.url
+      if (videoUrl) {
+        return {
+          success: true,
+          downloadUrl: videoUrl,
+          thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+          title: data?.title || data?.videoDetails?.title || 'YouTube Video',
+          duration: data?.duration || data?.videoDetails?.lengthSeconds || '0:00',
+          size: best?.qualityLabel || best?.quality || 'Bilinmiyor',
+          platform, api: 'RapidAPI-YT'
+        }
+      }
+      throw new Error('RapidAPI YT: video URL bulunamadı')
+
+    } else if (platform === 'Instagram') {
+      const shortcode = url.match(/(?:reel|p|tv)\/([A-Za-z0-9_-]+)/)?.[1]
+      if (!shortcode) throw new Error('Instagram shortcode bulunamadı')
+      res = await axios.get(
+        `https://${RAPIDAPI_HOST}/instagram/media`,
+        { params: { shortcode }, headers, timeout: 20000 }
+      )
+      const data = res.data
+      console.log('✅ RAPIDAPI_IG_RAW:', JSON.stringify(data).slice(0, 500))
+      const videoUrl = data?.video_url || data?.url ||
+        data?.media?.[0]?.video_url || data?.items?.[0]?.video_url
+      if (videoUrl) {
+        return {
+          success: true,
+          downloadUrl: videoUrl,
+          thumbnail: data?.thumbnail_url || data?.display_url || '',
+          title: data?.caption || data?.title || 'Instagram Video',
+          duration: '0:00', size: 'Bilinmiyor',
+          platform, api: 'RapidAPI-IG'
+        }
+      }
+      throw new Error('RapidAPI IG: video URL bulunamadı')
+
+    } else if (platform === 'X / Twitter') {
+      res = await axios.get(
+        `https://${RAPIDAPI_HOST}/twitter/media`,
+        { params: { url }, headers, timeout: 20000 }
+      )
+      const data = res.data
+      console.log('✅ RAPIDAPI_TW_RAW:', JSON.stringify(data).slice(0, 500))
+      const videos: any[] = data?.media?.videos || data?.videos || []
+      const best = videos.sort((a: any, b: any) =>
+        parseInt(b.bitrate || '0') - parseInt(a.bitrate || '0'))[0]
+      const videoUrl = best?.url || data?.url
+      if (videoUrl) {
+        return {
+          success: true,
+          downloadUrl: videoUrl,
+          thumbnail: data?.thumbnail || '',
+          title: data?.text || data?.title || 'Twitter Video',
+          duration: '0:00', size: 'Bilinmiyor',
+          platform, api: 'RapidAPI-TW'
+        }
+      }
+      throw new Error('RapidAPI TW: video URL bulunamadı')
+
+    } else if (platform === 'Facebook') {
+      res = await axios.get(
+        `https://${RAPIDAPI_HOST}/facebook/media`,
+        { params: { url }, headers, timeout: 20000 }
+      )
+      const data = res.data
+      console.log('✅ RAPIDAPI_FB_RAW:', JSON.stringify(data).slice(0, 500))
+      const videoUrl = data?.hd || data?.sd || data?.url
+      if (videoUrl) {
+        return {
+          success: true,
+          downloadUrl: videoUrl,
+          thumbnail: data?.thumbnail || '',
+          title: data?.title || 'Facebook Video',
+          duration: '0:00', size: data?.hd ? 'HD' : 'SD',
+          platform, api: 'RapidAPI-FB'
+        }
+      }
+      throw new Error('RapidAPI FB: video URL bulunamadı')
+    }
+
+    throw new Error('RapidAPI: desteklenmeyen platform')
+  } catch (error: any) {
+    console.error('🚨 RAPIDAPI_HATASI:', platform, error.message, error.response?.data)
+    return { success: false, error: error.message }
+  }
+}
+
 // Instagram — shortcode'dan graphql endpoint ile video URL çek
 async function trySaveInsta(url: string) {
   try {
@@ -404,22 +522,38 @@ export async function POST(request: NextRequest) {
         
       case 'Instagram':
         console.log('🚀 INSTAGRAM_MOTOR_BASLATILIYOR...')
-        result = await tryInstagram(decodedUrl)
+        result = await tryRapidAPI(decodedUrl, 'Instagram')
+        if (!result.success) {
+          console.log('⚠️ RapidAPI başarısız, fallback deneniyor...')
+          result = await tryInstagram(decodedUrl)
+        }
         break
         
       case 'YouTube':
         console.log('🚀 YOUTUBE_MOTOR_BASLATILIYOR...')
-        result = await tryYouTube(decodedUrl)
+        result = await tryRapidAPI(decodedUrl, 'YouTube')
+        if (!result.success) {
+          console.log('⚠️ RapidAPI başarısız, Invidious deneniyor...')
+          result = await tryYouTube(decodedUrl)
+        }
         break
         
       case 'X / Twitter':
         console.log('🚀 X_TWITTER_MOTOR_BASLATILIYOR...')
-        result = await tryXTwitter(decodedUrl)
+        result = await tryRapidAPI(decodedUrl, 'X / Twitter')
+        if (!result.success) {
+          console.log('⚠️ RapidAPI başarısız, TwitSave deneniyor...')
+          result = await tryXTwitter(decodedUrl)
+        }
         break
         
       case 'Facebook':
         console.log('🚀 FACEBOOK_MOTOR_BASLATILIYOR...')
-        result = await tryFacebook(decodedUrl)
+        result = await tryRapidAPI(decodedUrl, 'Facebook')
+        if (!result.success) {
+          console.log('⚠️ RapidAPI başarısız, GetFVid deneniyor...')
+          result = await tryFacebook(decodedUrl)
+        }
         break
         
       default:

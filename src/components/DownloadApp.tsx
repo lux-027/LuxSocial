@@ -255,18 +255,17 @@ export default function DownloadApp({
     const url = e.target.value
     setVideoUrl(url)
     setIsPreviewLoaded(false)
-    validateUrl(url, platformRegex)
+    setVideoPreview(null)
+    const isValid = validateUrl(url, platformRegex)
     
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current)
     }
     
-    if (url && !urlError) {
+    if (url && isValid) {
       debounceTimerRef.current = setTimeout(() => {
         fetchVideoPreview(url, platform)
-      }, 500)
-    } else {
-      setVideoPreview(null)
+      }, 800)
     }
   }
 
@@ -751,13 +750,14 @@ export default function DownloadApp({
                       navigator.clipboard.readText().then(text => {
                         if (text.trim()) {
                           setVideoUrl(text)
-                          validateUrl(text, platformRegex)
+                          setVideoPreview(null)
+                          const valid = validateUrl(text, platformRegex)
                           
                           if (debounceTimerRef.current) {
                             clearTimeout(debounceTimerRef.current)
                           }
                           
-                          if (!urlError) {
+                          if (valid) {
                             debounceTimerRef.current = setTimeout(() => {
                               fetchVideoPreview(text, platform)
                             }, 500)

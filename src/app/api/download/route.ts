@@ -45,123 +45,127 @@ async function tryTikWM(url: string) {
   }
 }
 
-// SaveInsta API (Instagram için)
+// Instagram — embed sayfasından og:video scrape et
 async function trySaveInsta(url: string) {
   try {
-    console.log('🚀 SAVEINSTA_API_DENEMESI_BASLADI:', url)
-    const formData = new URLSearchParams()
-    formData.append('url', url)
-    const response = await axios.post(
-      'https://v3.saveig.app/api/ajaxSearch',
-      formData.toString(),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': '*/*',
-          'Origin': 'https://saveig.app',
-          'Referer': 'https://saveig.app/'
-        },
-        timeout: 15000
-      }
-    )
-    console.log('✅ SAVEINSTA_RAW:', JSON.stringify(response.data).slice(0, 200))
-    const data = response.data
-    if (data?.status === 'ok' && data?.data) {
-      // HTML parse yerine video linkini bul
-      const html: string = data.data
-      const videoMatch = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/)
-      const thumbMatch = html.match(/src="(https:\/\/[^"]+\.(jpg|jpeg|png|webp)[^"]*)"/)
-      if (videoMatch) {
-        return {
-          success: true,
-          downloadUrl: videoMatch[1],
-          thumbnail: thumbMatch ? thumbMatch[1] : '',
-          title: 'Instagram Video',
-          duration: '0:00',
-          size: 'Bilinmiyor',
-          platform: 'Instagram',
-          api: 'SaveInsta'
-        }
+    // URL'yi temizle: sadece post/reel kısmını al
+    const cleanUrl = url.split('?')[0].replace(/\/$/, '')
+    const embedUrl = `${cleanUrl}/embed/`
+    console.log('🚀 INSTAGRAM_EMBED_DENENIYOR:', embedUrl)
+
+    const response = await axios.get(embedUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+      timeout: 15000,
+      maxRedirects: 5,
+    })
+
+    const html: string = typeof response.data === 'string' ? response.data : ''
+    console.log('✅ EMBED_HTML slice:', html.slice(0, 600))
+
+    // video_url veya src'yi bul
+    const videoMatch =
+      html.match(/"video_url":"([^"]+)"/) ||
+      html.match(/property="og:video"[^>]+content="([^"]+)"/) ||
+      html.match(/<video[^>]+src="([^"]+)"/)
+
+    const thumbMatch =
+      html.match(/"display_url":"([^"]+)"/) ||
+      html.match(/property="og:image"[^>]+content="([^"]+)"/)
+
+    const titleMatch = html.match(/property="og:title"[^>]+content="([^"]+)"/)
+
+    const rawVideoUrl = videoMatch?.[1]
+    if (rawVideoUrl) {
+      const videoUrl = rawVideoUrl.replace(/\\u0026/g, '&').replace(/\\/g, '')
+      const thumbnail = thumbMatch?.[1]?.replace(/\\u0026/g, '&').replace(/\\/g, '') || ''
+      return {
+        success: true,
+        downloadUrl: videoUrl,
+        thumbnail,
+        title: titleMatch?.[1] || 'Instagram Video',
+        duration: '0:00',
+        size: 'Bilinmiyor',
+        platform: 'Instagram',
+        api: 'InstaEmbed'
       }
     }
-    throw new Error('SaveInsta: video linki bulunamadı')
+    throw new Error('Embed: video linki bulunamadı')
   } catch (error: any) {
-    console.error('🚨 SAVEINSTA_HATASI:', error.message)
+    console.error('🚨 INSTAGRAM_EMBED_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// SnapInsta API (Instagram yedek)
+// Instagram yedek — picnob.com scraping
 async function trySnapInsta(url: string) {
   try {
-    console.log('🚀 SNAPINSTA_API_DENEMESI_BASLADI:', url)
-    const formData = new URLSearchParams()
-    formData.append('url', url)
-    formData.append('lang', 'tr')
-    const response = await axios.post(
-      'https://snapinsta.app/action.php',
-      formData.toString(),
+    console.log('🚀 PICNOB_DENENIYOR:', url)
+    const shortcode = url.match(/(?:reel|p)\/([A-Za-z0-9_-]+)/)?.[1]
+    if (!shortcode) throw new Error('Instagram shortcode bulunamadı')
+
+    const response = await axios.get(
+      `https://www.picnob.com/post/${shortcode}/`,
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Origin': 'https://snapinsta.app',
-          'Referer': 'https://snapinsta.app/'
+          'Accept': 'text/html',
+          'Referer': 'https://www.picnob.com/'
         },
         timeout: 15000
       }
     )
-    console.log('✅ SNAPINSTA_RAW:', JSON.stringify(response.data).slice(0, 200))
-    const html: string = typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
-    const videoMatch = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/)
-    const thumbMatch = html.match(/src="(https:\/\/[^"]+\.(jpg|jpeg|png|webp)[^"]*)"/)
-    if (videoMatch) {
+    const html: string = typeof response.data === 'string' ? response.data : ''
+    console.log('✅ PICNOB_RAW slice:', html.slice(0, 400))
+    const videoMatch = html.match(/<video[^>]+src="([^"]+\.mp4[^"]*)"/) ||
+      html.match(/data-src="([^"]+\.mp4[^"]*)"/)
+    if (videoMatch?.[1]) {
       return {
         success: true,
         downloadUrl: videoMatch[1],
-        thumbnail: thumbMatch ? thumbMatch[1] : '',
+        thumbnail: '',
         title: 'Instagram Video',
         duration: '0:00',
         size: 'Bilinmiyor',
         platform: 'Instagram',
-        api: 'SnapInsta'
+        api: 'Picnob'
       }
     }
-    throw new Error('SnapInsta: video linki bulunamadı')
+    throw new Error('Picnob: video linki bulunamadı')
   } catch (error: any) {
-    console.error('🚨 SNAPINSTA_HATASI:', error.message)
+    console.error('🚨 PICNOB_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// Facebook API (Facebook Video)
+// Facebook API — getfvid.com
 async function tryFacebook(url: string) {
   try {
     console.log('🚀 FACEBOOK_API_DENEMESI_BASLADI:', url)
-    // fdown.net API
     const formData = new URLSearchParams()
-    formData.append('id', url)
+    formData.append('url', url)
     const response = await axios.post(
-      'https://fdown.net/download.php',
+      'https://getfvid.com/downloader',
       formData.toString(),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Origin': 'https://fdown.net',
-          'Referer': 'https://fdown.net/'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Origin': 'https://getfvid.com',
+          'Referer': 'https://getfvid.com/'
         },
         timeout: 15000
       }
     )
-    console.log('✅ FDOWN_RAW:', JSON.stringify(response.data).slice(0, 300))
+    console.log('✅ GETFVID_RAW:', String(response.data).slice(0, 400))
     const html: string = typeof response.data === 'string' ? response.data : ''
-    // HD link dene
-    const hdMatch = html.match(/a[^>]+href="(https:\/\/[^"]+)"\ [^>]*>[^<]*HD/i)
-    const sdMatch = html.match(/a[^>]+href="(https:\/\/[^"]+)"\ [^>]*>[^<]*SD/i)
-    const anyMatch = html.match(/href="(https:\/\/video[^"]+)"/)
-    const link = hdMatch?.[1] || sdMatch?.[1] || anyMatch?.[1]
+    // HD veya SD mp4 linki çek
+    const hdMatch = html.match(/href=["'](https?:\/\/[^"']*\.mp4[^"']*)["'][^>]*>[^<]*(?:HD|High)/i)
+    const sdMatch = html.match(/href=["'](https?:\/\/[^"']*\.mp4[^"']*)["']/i)
+    const link = hdMatch?.[1] || sdMatch?.[1]
     if (link) {
       return {
         success: true,
@@ -171,10 +175,10 @@ async function tryFacebook(url: string) {
         duration: '0:00',
         size: 'Bilinmiyor',
         platform: 'Facebook',
-        api: 'FDown'
+        api: 'GetFVid'
       }
     }
-    throw new Error('FDown: video linki bulunamadı')
+    throw new Error('GetFVid: video linki bulunamadı')
   } catch (error: any) {
     console.error('🚨 FACEBOOK_API_HATASI:', error.message)
     return { success: false, error: error.message }
@@ -189,101 +193,113 @@ async function tryInstagram(url: string) {
   return await trySnapInsta(url)
 }
 
-// YouTube API — y2api + yt1s fallback
+// YouTube API — Invidious (açık kaynak, key yok)
+const INVIDIOUS_INSTANCES = [
+  'https://inv.tux.pizza',
+  'https://invidious.nerdvpn.de',
+  'https://invidious.privacyredirect.com',
+  'https://iv.datura.network',
+]
+
 async function tryYouTube(url: string) {
   try {
     console.log('🚀 YOUTUBE_API_DENEMESI_BASLADI:', url)
-    // yt1s.com API
-    const videoId = url.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{11})/)?.[1]
+    const videoId = url.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{11})/)?.[1]
     if (!videoId) throw new Error('YouTube video ID bulunamadı')
-    
-    // 1. Aşama: analiz isteği
-    const analyzeRes = await axios.post(
-      'https://yt1s.com/api/ajaxSearch/index',
-      new URLSearchParams({ q: url, vt: 'home' }).toString(),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Origin': 'https://yt1s.com',
-          'Referer': 'https://yt1s.com/'
-        },
-        timeout: 15000
-      }
-    )
-    console.log('✅ YT1S_ANALYZE:', JSON.stringify(analyzeRes.data).slice(0, 300))
-    const analyzeData = analyzeRes.data
-    if (!analyzeData?.vid || !analyzeData?.kc) throw new Error('YT1S analiz başarısız')
-    
-    // 2. Aşama: indirme linki al (mp4 720p veya en iyi)
-    const convertRes = await axios.post(
-      'https://yt1s.com/api/ajaxConvert/convert',
-      new URLSearchParams({ vid: analyzeData.vid, k: analyzeData.kc }).toString(),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Origin': 'https://yt1s.com',
-          'Referer': 'https://yt1s.com/'
-        },
-        timeout: 20000
-      }
-    )
-    console.log('✅ YT1S_CONVERT:', JSON.stringify(convertRes.data).slice(0, 300))
-    const convertData = convertRes.data
-    if (convertData?.status === 'ok' && convertData?.dlink) {
-      return {
-        success: true,
-        downloadUrl: convertData.dlink,
-        thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-        title: analyzeData.title || 'YouTube Video',
-        duration: analyzeData.t || '0:00',
-        size: 'Bilinmiyor',
-        platform: 'YouTube',
-        api: 'YT1S'
+
+    for (const instance of INVIDIOUS_INSTANCES) {
+      try {
+        console.log('🔄 INVIDIOUS_DENENIYOR:', instance)
+        const res = await axios.get(
+          `${instance}/api/v1/videos/${videoId}`,
+          {
+            headers: { 'User-Agent': 'Mozilla/5.0' },
+            timeout: 10000
+          }
+        )
+        const data = res.data
+        console.log('✅ INVIDIOUS_RAW title:', data?.title)
+
+        // mp4 formatlarını al, en yüksek kaliteli olanı seç
+        const formats: any[] = (data?.formatStreams || []).filter((f: any) =>
+          f.container === 'mp4' && f.url
+        )
+        const best = formats.sort((a: any, b: any) =>
+          parseInt(b.resolution || '0') - parseInt(a.resolution || '0')
+        )[0]
+
+        if (best?.url) {
+          const seconds = data?.lengthSeconds || 0
+          const dur = seconds > 0
+            ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+            : '0:00'
+          return {
+            success: true,
+            downloadUrl: best.url,
+            thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+            title: data?.title || 'YouTube Video',
+            duration: dur,
+            size: best.resolution || 'Bilinmiyor',
+            platform: 'YouTube',
+            api: `Invidious(${instance.replace('https://', '')})`
+          }
+        }
+      } catch (instErr: any) {
+        console.warn('⚠️ INVIDIOUS_INSTANCE_HATASI:', instance, instErr.message)
       }
     }
-    throw new Error('YT1S: indirme linki alınamadı')
+    throw new Error('Tüm Invidious instance\'ları başarısız')
   } catch (error: any) {
     console.error('🚨 YOUTUBE_API_HATASI:', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// X/Twitter API — twitsave.com
+// X/Twitter API — twittervideodownloader.com
 async function tryXTwitter(url: string) {
   try {
-    console.log('� X_TWITTER_API_DENEMESI_BASLADI:', url)
-    const response = await axios.get(
+    console.log('🚀 X_TWITTER_API_DENEMESI_BASLADI:', url)
+    // twitsave API
+    const res1 = await axios.get(
       `https://twitsave.com/info?url=${encodeURIComponent(url)}`,
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
           'Referer': 'https://twitsave.com/'
         },
         timeout: 15000
       }
     )
-    console.log('✅ TWITSAVE_RAW:', String(response.data).slice(0, 400))
-    const html: string = typeof response.data === 'string' ? response.data : ''
-    // En yüksek kalite mp4 linki bul
-    const videoMatch = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/)
-    const thumbMatch = html.match(/<img[^>]+src="(https:\/\/pbs\.twimg\.com[^"]+)"/)
-    const titleMatch = html.match(/<title>([^<]+)<\/title>/)
-    if (videoMatch) {
+    const html1: string = typeof res1.data === 'string' ? res1.data : ''
+    console.log('✅ TWITSAVE_RAW:', html1.slice(0, 500))
+    // mp4 linklerini bul (en yüksek kalite)
+    const mp4Re = /href=["'](https?:\/\/video\.twimg\.com[^"']*\.mp4[^"']*)["']/gi
+    const mp4Urls: string[] = []
+    let mp4Match: RegExpExecArray | null
+    while ((mp4Match = mp4Re.exec(html1)) !== null) {
+      mp4Urls.push(mp4Match[1])
+    }
+    const thumbMatch = html1.match(/property="og:image"[^>]+content=["'](https?:\/\/[^"']+)["']/i)
+      || html1.match(/<img[^>]+src=["'](https?:\/\/pbs\.twimg\.com[^"']+)["']/i)
+    const titleMatch = html1.match(/property="og:title"[^>]+content=["']([^"']+)["']/i)
+      || html1.match(/<title>([^<]+)<\/title>/i)
+    if (mp4Urls.length > 0) {
+      // En yüksek çözünürlüklü olanı al (genellikle son)
+      const bestUrl = mp4Urls[mp4Urls.length - 1]
       return {
         success: true,
-        downloadUrl: videoMatch[1],
-        thumbnail: thumbMatch ? thumbMatch[1] : '',
-        title: titleMatch ? titleMatch[1].replace(' - TwitSave', '').trim() : 'Twitter Video',
+        downloadUrl: bestUrl,
+        thumbnail: thumbMatch?.[1] || '',
+        title: titleMatch?.[1]?.replace(/\s*[-|]\s*TwitSave.*/i, '').trim() || 'Twitter Video',
         duration: '0:00',
         size: 'Bilinmiyor',
         platform: 'X / Twitter',
         api: 'TwitSave'
       }
     }
-    throw new Error('TwitSave: video linki bulunamadı')
+    throw new Error('TwitSave: mp4 linki bulunamadı')
   } catch (error: any) {
     console.error('🚨 X_TWITTER_API_HATASI:', error.message)
     return { success: false, error: error.message }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { Download, Play, Loader2, DownloadCloud, Instagram, Youtube, Twitter, Facebook, Music2, Palette, Zap, Shield, FileText, Info, Mail, ChevronDown, Link as LinkIcon, Copy, LayoutGrid, Menu, X, Share2, HelpCircle } from 'lucide-react'
@@ -75,10 +75,7 @@ export default function HomePage() {
   const [isLegalOpen, setIsLegalOpen] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const randomFaqs = useMemo(() => {
-    const shuffled = [...allFaqs].sort(() => Math.random() - 0.5)
-    return shuffled.slice(0, 5)
-  }, [])
+  const [randomFaqs, setRandomFaqs] = useState(allFaqs.slice(0, 5))
   const headerRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -90,6 +87,8 @@ export default function HomePage() {
     if (headerRef.current) {
       setHeaderHeight(headerRef.current.offsetHeight)
     }
+    const shuffled = [...allFaqs].sort(() => Math.random() - 0.5)
+    setRandomFaqs(shuffled.slice(0, 5))
   }, [])
 
   return (

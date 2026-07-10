@@ -774,44 +774,54 @@ export default function DownloadApp({
                   <span className="hidden md:inline">Yapıştır</span>
                 </button>
               </div>
-              {urlError && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <span className="mr-1">⚠️</span>
-                  {urlError}
-                </p>
-              )}
+              <AnimatePresence>
+                {urlError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                    className="mt-2.5 flex items-center space-x-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5"
+                  >
+                    <span className="text-red-500 text-base shrink-0">⚠️</span>
+                    <p className="text-sm text-red-600 font-medium">{urlError}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="text-center">
-              <button
-                onClick={handleDownload}
-                disabled={!videoUrl.trim() || !!urlError || isLoading || (videoPreview && !isPreviewLoaded)}
-                className={`
-                  py-3 sm:py-4 px-8 sm:px-16 rounded-2xl text-base sm:text-lg shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-3 mx-auto font-bold w-full sm:w-auto justify-center
-                  ${
-                    !videoUrl.trim() || !!urlError || isLoading || (videoPreview && !isPreviewLoaded)
-                      ? 'bg-gray-400 text-white cursor-not-allowed opacity-50'
-                      : 'animated-gradient-bg text-white shadow-[0_0_25px_rgba(103,22,223,1),0_0_50px_rgba(103,22,223,0.8),0_0_75px_rgba(103,22,223,0.6),inset_0_0_20px_rgba(255,255,255,0.3)] transition duration-200 ease-in-out'
-                  }
-                `}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center space-x-3">
-                    <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-white" />
-                    <span className="text-white">İndiriliyor...</span>
-                  </div>
-                ) : videoPreview && !isPreviewLoaded ? (
-                  <div className="flex items-center justify-center space-x-3">
-                    <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-white" />
-                    <span className="text-white">Yükleniyor...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center space-x-3">
-                    <Download className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                    <span className="text-white">Videoyu İndir</span>
-                  </div>
-                )}
-              </button>
+              {(() => {
+                const isDisabled = !videoPreview || isLoading || isPreviewLoading
+                return (
+                  <button
+                    onClick={handleDownload}
+                    disabled={isDisabled}
+                    className={`w-full sm:w-auto mx-auto flex items-center justify-center space-x-2 px-10 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200
+                      ${isDisabled
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-sky-500 hover:bg-sky-600 text-white shadow-md hover:shadow-lg active:scale-95'
+                      }`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>İndiriliyor...</span>
+                      </>
+                    ) : isPreviewLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Hazırlanıyor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        <span>Videoyu İndir</span>
+                      </>
+                    )}
+                  </button>
+                )
+              })()}
             </div>
 
             <AnimatePresence>

@@ -29,7 +29,7 @@ export default function SiteHeader({ onHeightChange }: SiteHeaderProps) {
   const navLink = (href: string, label: string) => (
     <Link
       href={href}
-      className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
+      className={`px-2 py-1.5 lg:px-4 lg:py-2 text-xs lg:text-sm font-medium rounded-full transition-all duration-300 whitespace-nowrap ${
         activePath === href ? 'bg-sky-500 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'
       }`}
     >
@@ -55,15 +55,15 @@ export default function SiteHeader({ onHeightChange }: SiteHeaderProps) {
       <header ref={headerRef} className="bg-white shadow-lg sticky top-0 z-[60] overflow-visible">
         <div className="container mx-auto px-4 relative z-10 overflow-visible">
           {/* Desktop */}
-          <div className="hidden md:flex items-center justify-between py-6">
-            <Link href="/" className="flex items-center space-x-3">
-              <Logo className="w-12 h-12" />
-              <span className="text-4xl font-black tracking-tight">
+          <div className="hidden md:flex items-center justify-between py-3 lg:py-6 gap-2">
+            <Link href="/" className="flex items-center space-x-2 lg:space-x-3 shrink-0">
+              <Logo className="w-8 h-8 lg:w-12 lg:h-12" />
+              <span className="text-2xl lg:text-4xl font-black tracking-tight">
                 <span className="text-sky-600">Lux</span>
                 <span className="text-gray-900">Social</span>
               </span>
             </Link>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center gap-0.5 lg:gap-1 flex-wrap justify-end">
               {navLink('/', 'Ana Sayfa')}
               {navLink('/tiktok', 'TikTok')}
               {navLink('/instagram', 'Instagram')}
@@ -73,10 +73,10 @@ export default function SiteHeader({ onHeightChange }: SiteHeaderProps) {
               {navLink('/sss', 'SSS')}
               <button
                 onClick={() => setIsShareOpen(true)}
-                className="p-2 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors ml-1"
+                className="p-1.5 lg:p-2 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors ml-0.5 shrink-0"
                 aria-label="Paylaş"
               >
-                <Share2 className="w-5 h-5" />
+                <Share2 className="w-4 h-4 lg:w-5 lg:h-5" />
               </button>
             </div>
           </div>

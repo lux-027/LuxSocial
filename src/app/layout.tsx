@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'LuxSocial',
     images: [
       {
-        url: `${BASE_URL}/og-image.jpg`,
+        url: `${BASE_URL}/opengraph-image`,
         width: 1200,
         height: 630,
         alt: 'LuxSocial - Ücretsiz Filigransız Video İndirme',
@@ -59,18 +59,18 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'LuxSocial | TikTok, Instagram, YouTube Video İndir',
     description: 'TikTok, Instagram, YouTube, Twitter ve Facebook videolarını ücretsiz ve filigransız indirin.',
-    images: [`${BASE_URL}/og-image.jpg`],
+    images: [`${BASE_URL}/opengraph-image`],
     creator: '@luxsocial',
   },
   icons: {
     icon: [
       { url: '/logo.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/luxsociallogo.png', sizes: '192x192', type: 'image/png' },
     ],
     apple: [
-      { url: '/logo.svg', type: 'image/svg+xml' },
+      { url: '/luxsociallogo.png', sizes: '180x180', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico',
+    shortcut: '/logo.svg',
   },
   manifest: '/manifest.json',
   alternates: {
@@ -90,7 +90,8 @@ export default function RootLayout({
     <html lang="tr-TR" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/logo.svg" />
+        <link rel="icon" href="/luxsociallogo.png" type="image/png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="/luxsociallogo.png" sizes="180x180" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0ea5e9" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

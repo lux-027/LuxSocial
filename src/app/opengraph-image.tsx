@@ -4,6 +4,7 @@ export const runtime = 'edge'
 export const alt = 'LuxSocial - Ücretsiz Filigransız Video İndirme'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
+// Bu dosya Next.js tarafından /opengraph-image adresinde otomatik servis edilir.
 
 export default async function Image() {
   return new ImageResponse(

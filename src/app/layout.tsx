@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'LuxSocial',
     images: [
       {
-        url: `${BASE_URL}/opengraph-image`,
+        url: `${BASE_URL}/og-image.png`,
         width: 1200,
         height: 630,
         alt: 'LuxSocial - Ücretsiz Filigransız Video İndirme',
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'LuxSocial | TikTok, Instagram, YouTube Video İndir',
     description: 'TikTok, Instagram, YouTube, Twitter ve Facebook videolarını ücretsiz ve filigransız indirin.',
-    images: [`${BASE_URL}/opengraph-image`],
+    images: [`${BASE_URL}/og-image.png`],
     creator: '@luxsocial',
   },
   icons: {

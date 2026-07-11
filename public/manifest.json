@@ -9,21 +9,10 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/luxsociallogo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/luxsociallogo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
       "src": "/logo.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "categories": ["productivity", "utilities"],

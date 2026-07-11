@@ -65,10 +65,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/logo.svg', type: 'image/svg+xml' },
-      { url: '/luxsociallogo.png', sizes: '192x192', type: 'image/png' },
     ],
     apple: [
-      { url: '/luxsociallogo.png', sizes: '180x180', type: 'image/png' },
+      { url: '/logo.svg', type: 'image/svg+xml' },
     ],
     shortcut: '/logo.svg',
   },
@@ -90,8 +89,7 @@ export default function RootLayout({
     <html lang="tr-TR" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
-        <link rel="icon" href="/luxsociallogo.png" type="image/png" sizes="192x192" />
-        <link rel="apple-touch-icon" href="/luxsociallogo.png" sizes="180x180" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0ea5e9" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

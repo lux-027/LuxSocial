@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { Download, Play, Loader2, DownloadCloud, Instagram, Youtube, Twitter, Facebook, Music2, Palette, Zap, Shield, FileText, Info, Mail, ChevronDown, Link as LinkIcon, Copy, LayoutGrid, Menu, X, Share2, HelpCircle } from 'lucide-react'
+import { Download, Play, Loader2, DownloadCloud, Instagram, Youtube, Twitter, Facebook, Music2, Palette, Zap, Shield, FileText, Info, Mail, ChevronDown, Link as LinkIcon, LayoutGrid, Menu, X, Share2, HelpCircle } from 'lucide-react'
 import Logo from '@/components/Logo'
+import ShareModal from '@/components/ShareModal'
 
 const allFaqs = [
   { q: 'LuxSocial nedir?', a: 'LuxSocial, TikTok, Instagram, YouTube, Twitter (X) ve Facebook gibi sosyal medya platformlarından videoları ücretsiz ve filigransız olarak indirmenizi sağlayan bir web uygulamasıdır.' },
@@ -72,6 +73,7 @@ export default function HomePage() {
   const [isHovered, setIsHovered] = useState<string | null>(null)
   const [activePath, setActivePath] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isShareOpen, setIsShareOpen] = useState(false)
   const [isLegalOpen, setIsLegalOpen] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -160,13 +162,7 @@ export default function HomePage() {
                 SSS
               </Link>
               <button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({ title: 'LuxSocial', url: window.location.href })
-                  } else {
-                    navigator.clipboard.writeText(window.location.href)
-                  }
-                }}
+                onClick={() => setIsShareOpen(true)}
                 className="p-2 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
                 aria-label="Paylaş"
               >
@@ -188,13 +184,7 @@ export default function HomePage() {
               
               <div className="flex items-center space-x-1.5">
                 <button
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({ title: 'LuxSocial', url: window.location.href })
-                    } else {
-                      navigator.clipboard.writeText(window.location.href)
-                    }
-                  }}
+                  onClick={() => setIsShareOpen(true)}
                   className="p-2.5 rounded-xl bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
                   aria-label="Paylaş"
                 >
@@ -369,6 +359,9 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
+      {/* Paylaşım Modal */}
+      <ShareModal isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
+
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
@@ -396,13 +389,13 @@ export default function HomePage() {
             
             {/* CTA Butonları */}
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-12 px-2">
-              <Link 
-                href="/tiktok"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-sky-500 to-sky-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm sm:text-base"
+              <button
+                onClick={() => document.getElementById('platformlar')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-sky-500 to-sky-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm sm:text-base cursor-pointer"
               >
                 <DownloadCloud className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Hemen İndir</span>
-              </Link>
+              </button>
               <Link 
                 href="/hakkinda"
                 className="inline-flex items-center space-x-2 bg-white text-gray-700 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl border border-gray-200 transform hover:scale-105 transition-all duration-300 text-sm sm:text-base"
@@ -437,7 +430,7 @@ export default function HomePage() {
         </section>
 
         {/* Platform Kartları Grid */}
-        <section className="mb-20">
+        <section id="platformlar" className="mb-20 scroll-mt-24">
           <div className="text-center mb-8 sm:mb-12">
             <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">Desteklenen Platformlar</h3>
             <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto px-2">Tüm popüler sosyal medya platformlarından videoları filigransız olarak indirin</p>

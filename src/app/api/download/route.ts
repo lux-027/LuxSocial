@@ -45,6 +45,69 @@ async function tryTikWM(url: string) {
   }
 }
 
+// Cobalt API — ücretsiz community instance
+const COBALT_INSTANCES = [
+  'https://cobaltapi.cjs.nz',
+]
+
+async function tryCobalt(url: string) {
+  try {
+    console.log('🚀 COBALT_DENENIYOR:', url)
+    for (const instance of COBALT_INSTANCES) {
+      try {
+        const res = await axios.post(
+          instance,
+          { url, downloadMode: 'auto' },
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            timeout: 25000,
+          }
+        )
+        console.log('✅ COBALT_RAW:', JSON.stringify(res.data).slice(0, 300))
+        const data = res.data
+
+        if (data?.status === 'tunnel' || data?.status === 'redirect') {
+          return {
+            success: true,
+            downloadUrl: data.url,
+            thumbnail: '',
+            title: 'Video',
+            duration: '0:00',
+            size: 'Bilinmiyor',
+            platform: 'Unknown',
+            api: `Cobalt(${instance})`
+          }
+        }
+
+        if (data?.status === 'picker' && Array.isArray(data.pickerItems)) {
+          const video = data.pickerItems.find((i: any) => i.type === 'video')
+          if (video?.url) {
+            return {
+              success: true,
+              downloadUrl: video.url,
+              thumbnail: video.thumb || '',
+              title: 'Video',
+              duration: '0:00',
+              size: 'Bilinmiyor',
+              platform: 'Unknown',
+              api: `Cobalt(${instance})`
+            }
+          }
+        }
+      } catch (instErr: any) {
+        console.warn('⚠️ COBALT_INSTANCE_HATASI:', instErr.message, instErr.response?.data)
+      }
+    }
+    throw new Error('Tüm Cobalt instance\'ları başarısız')
+  } catch (error: any) {
+    console.error('🚨 COBALT_HATASI:', error.message)
+    return { success: false, error: error.message }
+  }
+}
+
 // RapidAPI — social-media-video-downloader by Emmanuel
 const RAPIDAPI_HOST = 'social-media-video-downloader.p.rapidapi.com'
 
@@ -406,12 +469,6 @@ async function tryXTwitter(url: string) {
   }
 }
 
-// TikWM yedek (TikTok fallback)
-async function tryCobalt(url: string) {
-  // TikTok için sadece TikWM yedek olarak kullan
-  return await tryTikWM(url)
-}
-
 export async function POST(request: NextRequest) {
   try {
     const { url, platform } = await request.json()
@@ -500,37 +557,53 @@ export async function POST(request: NextRequest) {
         
       case 'Instagram':
         console.log('🚀 INSTAGRAM_MOTOR_BASLATILIYOR...')
-        result = await tryRapidAPI(decodedUrl, 'Instagram')
+        result = await tryCobalt(decodedUrl)
         if (!result.success) {
-          console.log('⚠️ RapidAPI başarısız, fallback deneniyor...')
-          result = await tryInstagram(decodedUrl)
+          console.log('⚠️ Cobalt başarısız, RapidAPI deneniyor...')
+          result = await tryRapidAPI(decodedUrl, 'Instagram')
+          if (!result.success) {
+            console.log('⚠️ RapidAPI başarısız, fallback deneniyor...')
+            result = await tryInstagram(decodedUrl)
+          }
         }
         break
         
       case 'YouTube':
         console.log('🚀 YOUTUBE_MOTOR_BASLATILIYOR...')
-        result = await tryRapidAPI(decodedUrl, 'YouTube')
+        result = await tryCobalt(decodedUrl)
         if (!result.success) {
-          console.log('⚠️ RapidAPI başarısız, Invidious deneniyor...')
-          result = await tryYouTube(decodedUrl)
+          console.log('⚠️ Cobalt başarısız, RapidAPI deneniyor...')
+          result = await tryRapidAPI(decodedUrl, 'YouTube')
+          if (!result.success) {
+            console.log('⚠️ RapidAPI başarısız, Invidious deneniyor...')
+            result = await tryYouTube(decodedUrl)
+          }
         }
         break
         
       case 'X / Twitter':
         console.log('🚀 X_TWITTER_MOTOR_BASLATILIYOR...')
-        result = await tryRapidAPI(decodedUrl, 'X / Twitter')
+        result = await tryCobalt(decodedUrl)
         if (!result.success) {
-          console.log('⚠️ RapidAPI başarısız, TwitSave deneniyor...')
-          result = await tryXTwitter(decodedUrl)
+          console.log('⚠️ Cobalt başarısız, RapidAPI deneniyor...')
+          result = await tryRapidAPI(decodedUrl, 'X / Twitter')
+          if (!result.success) {
+            console.log('⚠️ RapidAPI başarısız, TwitSave deneniyor...')
+            result = await tryXTwitter(decodedUrl)
+          }
         }
         break
         
       case 'Facebook':
         console.log('🚀 FACEBOOK_MOTOR_BASLATILIYOR...')
-        result = await tryRapidAPI(decodedUrl, 'Facebook')
+        result = await tryCobalt(decodedUrl)
         if (!result.success) {
-          console.log('⚠️ RapidAPI başarısız, GetFVid deneniyor...')
-          result = await tryFacebook(decodedUrl)
+          console.log('⚠️ Cobalt başarısız, RapidAPI deneniyor...')
+          result = await tryRapidAPI(decodedUrl, 'Facebook')
+          if (!result.success) {
+            console.log('⚠️ RapidAPI başarısız, GetFVid deneniyor...')
+            result = await tryFacebook(decodedUrl)
+          }
         }
         break
         

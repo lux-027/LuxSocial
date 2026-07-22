@@ -11,6 +11,11 @@ export default function InstagramPage() {
       placeholder="https://www.instagram.com/reel/..."
       title="Instagram Reels & Video İndir"
       description="Instagram reels, video ve hikayelerini filigransız indirin."
+      theme={{
+        bg: 'linear-gradient(135deg, #4c1d95 0%, #be185d 60%, #4c1d95 100%)',
+        glow: '#e879f9',
+        accentText: 'text-pink-400'
+      }}
     />
   )
 }

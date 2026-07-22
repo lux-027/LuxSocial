@@ -14,6 +14,11 @@ interface DownloadAppProps {
   placeholder: string
   title: string
   description: string
+  theme?: {
+    bg: string
+    glow: string
+    accentText: string
+  }
 }
 
 const TikTokLogo = ({ className = "w-8 h-8" }: { className?: string }) => (
@@ -40,7 +45,12 @@ export default function DownloadApp({
   platformRegex, 
   placeholder, 
   title, 
-  description 
+  description,
+  theme = {
+    bg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)',
+    glow: '#38bdf8',
+    accentText: 'text-sky-400'
+  }
 }: DownloadAppProps) {
   const PlatformIcon = getPlatformIcon(platformIcon)
   const [videoUrl, setVideoUrl] = useState('')
@@ -658,11 +668,11 @@ export default function DownloadApp({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
             className="relative mb-8 sm:mb-12 rounded-3xl overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)' }}
+            style={{ background: theme.bg }}
           >
             {/* Subtle glow */}
             <div className={`absolute inset-0 ${platformColor} opacity-10`} />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-40 blur-3xl opacity-20 bg-sky-400 rounded-full" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-40 blur-3xl opacity-20 rounded-full" style={{ backgroundColor: theme.glow }} />
 
             <div className="relative z-10 px-6 sm:px-12 py-10 sm:py-14 flex flex-col items-center text-center">
 
@@ -696,7 +706,7 @@ export default function DownloadApp({
               {/* Subtitle */}
               <p className="text-xl sm:text-2xl font-bold mb-3">
                 <span className="text-white">Filigransız </span>
-                <span className="text-sky-400">Video </span>
+                <span className={theme.accentText}>Video </span>
                 <span className="text-white">İndirme</span>
               </p>
 

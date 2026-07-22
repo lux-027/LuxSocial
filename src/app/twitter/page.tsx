@@ -11,6 +11,11 @@ export default function TwitterPage() {
       placeholder="https://x.com/kullanici/status/..."
       title="X / Twitter Video İndir"
       description="X (Twitter) videolarını yüksek kalitede indirin."
+      theme={{
+        bg: 'linear-gradient(135deg, #0c4a6e 0%, #0369a1 60%, #0c4a6e 100%)',
+        glow: '#38bdf8',
+        accentText: 'text-sky-400'
+      }}
     />
   )
 }

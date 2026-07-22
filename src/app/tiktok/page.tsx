@@ -11,6 +11,11 @@ export default function TikTokPage() {
       placeholder="https://tiktok.com/@user/video/..."
       title="TikTok Video İndirme"
       description="TikTok videolarını saniyeler içinde filigransiz indirin"
+      theme={{
+        bg: 'linear-gradient(135deg, #000000 0%, #1f2937 60%, #000000 100%)',
+        glow: '#6b7280',
+        accentText: 'text-gray-400'
+      }}
     />
   )
 }

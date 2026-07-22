@@ -11,6 +11,11 @@ export default function FacebookPage() {
       placeholder="https://www.facebook.com/watch/?v=..."
       title="Facebook Video İndir"
       description="Facebook videolarını ve reels'lerini yüksek kalitede indirin."
+      theme={{
+        bg: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #1e3a8a 100%)',
+        glow: '#60a5fa',
+        accentText: 'text-blue-400'
+      }}
     />
   )
 }
